@@ -2,7 +2,9 @@
 
 # Vidéo
 
-Hans Rosling's 200 Countries, 200 Years, 4 Minutes - The Joy of Stats - BBC Four-jbkSRLYSojo.mp4
+Hans Rosling's 200 Countries, 200 Years, 4 Minutes - The Joy of Stats (BBC Four)
+
+<iframe width="560" height="315" src="https://www.youtube.com/embed/jbkSRLYSojo" frameborder="0" allowfullscreen></iframe>
 
 # Données
 Les données de cette vidéo sont disponibles sur le site de Gapminder.
