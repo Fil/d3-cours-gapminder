@@ -8,8 +8,8 @@
 
 <body>
 
-    <svg width=640 height=400>
-        <g transform="translate(320,200)"></g>
+    <svg width=680 height=420>
+        <g transform="translate(30,30)"></g>
     </svg>
 
 </body>
@@ -89,7 +89,7 @@
                 .domain([0, d3.max(data, function (d) {
                     return d.pop;
                 })])
-                .range([0, 200]);
+                .range([0, 40]);
 
             var x = d3.scale.log()
                 .domain(d3.extent(data, function (d) {
@@ -101,7 +101,7 @@
                 .domain(d3.extent(data, function (d) {
                     return d.sante;
                 }))
-                .range([0, 400]);
+                .range([400, 0]);
 
             var categorie = d3.scale.category10();
 
