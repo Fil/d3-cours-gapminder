@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Page 1</title>
+</head>
+
+<body>
+
+    <svg width=640 height=400>
+        <g transform="translate(320,200)"></g>
+    </svg>
+
+</body>
+
+<script src="./d3.min.js"></script>
+<script>
+    function nombre(x) {
+        if (!x) return null;
+        return +(x.replace(/,/g, ''));
+    }
+
+    d3.csv('indicator gapminder population - Data.csv', function (data) {
+        data2 = data
+            .map(function (d) {
+                var e = {
+                    nom: d['Total population'],
+                    pop2015: nombre(d[2015]),
+                };
+                return e;
+            });
+
+        data2 = data2.sort(function (a, b) {
+                return d3.descending(a.pop2015, b.pop2015);
+            })
+            .slice(0, 10);
+
+        var rayon = d3.scale.sqrt()
+            .domain([ 0, d3.max(data2, function(d) {
+                return d.pop2015;
+            }) ])
+            .range([ 0, 200 ]);
+
+        var pays = d3.select('svg g')
+            .selectAll('circle')
+            .data(data2);
+
+        pays
+            .enter()
+            .append('circle')
+            .attr({
+                cx: 0,
+                cy: 0,
+                r: function(d) {
+                    return rayon(d.pop2015);
+                },
+                fill: 'transparent',
+                stroke: 'red',
+            })
+            .on('click', function (d) {
+                var texte = d.nom + ': ' + d.pop2015;
+                alert(texte);
+                // d3.select(this).html( texte );
+            });
+    });
+</script>
+
+</html>
