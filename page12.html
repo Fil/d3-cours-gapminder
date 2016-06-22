@@ -164,12 +164,26 @@
             legendes.append("g")
                 .attr("class", "x axis")
                 .attr("transform", "translate(0," + 400 + ")")
-                .call(xAxis);
+                .call(xAxis)
+                .append('text')
+                .text('PIB par habitant')
+                .attr({
+                    transform: 'translate(640,-8)',
+                    'text-anchor': 'end'
+                });
 
             legendes.append("g")
                 .attr("class", "y axis")
                 .attr("transform", "translate(0,0)")
-                .call(yAxis);
+                .call(yAxis)
+                .append('text')
+                .text('Espérance de vie à la naissance')
+                .attr({
+                    transform: 'translate(5,8)',
+                    'text-anchor': 'start'
+                });
+
+
 
         });
 </script>
