@@ -50,7 +50,7 @@ Le bookmarklet s'avère très pratique !
 
 Pour charger des données dans une page web, il faut passer par le langage Javascript.
 
-Commençons tout de suite par une structure de page Web classique, contenant deux scripts (`page1.html`). L’un est d3.js, l’autre un script personnalisable, dans lequel on va pouvoir développer.
+Commençons tout de suite par une structure de page Web classique, contenant deux scripts ([`page1.html`](page1.html)). L’un est d3.js, l’autre un script personnalisable, dans lequel on va pouvoir développer.
 
 Dans ce script, commençons tout de suite par charger nos données :
 
@@ -119,7 +119,7 @@ La première ligne renvoie `null` si la variable `x` est vide ; la seconde conv
 
 Nous sommes maintenant prêts à nettoyer nos données.
 
-Commençons par récupérer pour chaque pays, son nom, et sa population à la date 2015 (`page2.html`).
+Commençons par récupérer pour chaque pays, son nom, et sa population à la date 2015 ([`page2.html`](page2.html)).
 
 Dans la fonction de rappel de `d3.csv`, on va traiter la liste de données `data` avec la méthode `.map()`. Cette méthode emploie une autre fonction de rappel, à laquelle elle passe un par un les objets de notre liste. Et elle compose une autre liste avec les valeurs renvoyées par cette fonction.
 
@@ -174,7 +174,7 @@ Cette méthode de création de nos éléments visuels (ici, des paragraphes), es
 
 Or c’est là que `d3` devient puissant : il propose un ensemble de techniques, qui permettent de créer des animations visuelles, ou proposer de l'interaction à l'utilisateur. Et pour cela, il faut tout d'abord lier les données aux éléments visuels.
 
-Cette méthode consiste à remplacer le code précédent par la construction un peu plus abstraite que voici.
+Cette méthode consiste à remplacer le code précédent par la construction un peu plus abstraite que voici ([`page3.html`](page3.html)).
 
 ```
         var pays = d3.select('body')
@@ -224,7 +224,7 @@ Le point le plus important est celui-ci : les données sont désormais enregistr
 
 # Un exemple (simpliste) d'interaction avec les données
 
-Dans cet exemple (`page4.html`), on modifie simplement la création des éléments `p` :
+Dans cet exemple ([`page4.html`](page4.html)), on modifie simplement la création des éléments `p` :
 
 ```
         pays
@@ -270,14 +270,14 @@ SVG en propose bien d'autres : `<line>`: plusieurs points reliés par une ligne,
 
 Chaque élément graphique de SVG peut être modifié, déplacé, mis à l'échelle, colorié etc, par simple modification des ses attributs ou de son style CSS.
 
-La `page5.html` donne un exemple de contenu SVG.
+La [`page5.html`](page5.html) donne un exemple de contenu SVG.
 
 Observer le code et manipuler les attributs des différents éléments dans l'inspecteur pour voir comment ils affectent le graphique.
 
 
 # Visualisation graphique de nos données
 
-Pour faire un graphique avec nos données, il suffit dès lors de combiner les techniques de data-binding de `d3` avec le format SVG. Ce qui est fait `page6.html`
+Pour faire un graphique avec nos données, il suffit dès lors de combiner les techniques de data-binding de `d3` avec le format SVG. Ce qui est fait [`page6.html`](page6.html)
 
 ```
     <svg width=640 height=400>
@@ -333,7 +333,7 @@ Le rayon de notre cercle (`r`) correspond à la variable visuelle TAILLE. Le bou
 
 `d3` généralise ce principe en définissant des _échelles_ (_scales_), qui ont un domaine (en entrée, _domain_) et une étendue (en sortie, _range_), et convertissent donc des information de leur dimension « données » à leur dimension « visuelle ».
 
-Ainsi par exemple on écrirait de préférence :
+Ainsi par exemple on écrirait de préférence ([`page7.html`](page7.html)) :
 
 ```
         var rayon = d3.scale.sqrt()
@@ -355,7 +355,7 @@ Notre graphique est alors défini par des données, qui sont liées à des élé
 
 Plusieurs types d'échelles sont proposés de façon standard par `d3`; linéaire, logarithmique, à seuils ; mais aussi des échelles de temps (prenant en compte les jours, mois, heure d'hiver etc), ou encore de couleur, où l'étendue n'est pas un nombre mais un code de couleur HTML.
 
-Une échelle très pratique est `d3.scale.category10()`. On la découvre `page8.html`. Elle prend en domaine n'importe quelle valeur (ici, le nom du pays), et son étendue est une liste de 10 couleurs, qu'elle parcourt dans l'ordre.
+Une échelle très pratique est `d3.scale.category10()`. On la découvre [`page8.html`](page8.html). Elle prend en domaine n'importe quelle valeur (ici, le nom du pays), et son étendue est une liste de 10 couleurs, qu'elle parcourt dans l'ordre.
 
 ```
        var categorie = d3.scale.category10();
@@ -418,7 +418,7 @@ d3.csv('population.csv', function(population) {
 
 Cette approche fonctionne mais n'est pas idéale, car elle attend la fin du chargement d'un fichier pour lancer le second chargement, puis le troisième. Par ailleurs c'est un peu « laid ».
 
-Mais `d3` fournit [d3-queue](https://github.com/d3/d3-queue), un outil qui permet de charger de façon parallèle plusieurs fichiers (`page9.html`) et d'attendre que tous soient arrivés pour lancer une fonction de rappel:
+Mais `d3` fournit [d3-queue](https://github.com/d3/d3-queue), un outil qui permet de charger de façon parallèle plusieurs fichiers ([`page9.html`](page9.html)) et d'attendre que tous soient arrivés pour lancer une fonction de rappel:
 
 `<script src="./queue.v1.js"></script>`
 
@@ -487,7 +487,7 @@ data = data.filter(function (d) {
 
 # Créer les échelles
 
-Maintenant que nous avons notre liste de données à afficher, et avons extrait les dimensions, nous pouvons créer les échelles pour les transformer en variables visuelles (`page10.html`).
+Maintenant que nous avons notre liste de données à afficher, et avons extrait les dimensions, nous pouvons créer les échelles pour les transformer en variables visuelles ([`page10.html`](page10.html)).
 
 ### nom du pays
 => texte en survol (pas d'échelle)
@@ -546,7 +546,7 @@ On applique alors ces variables visuelles
 
 c'est un peu le bazar, mais on retrouve bien nos pays !
 
-Dans la `page11.html`, on fait quelques tout petits ajustements :
+Dans la [`page11.html`](page11.html), on fait quelques tout petits ajustements :
 
 On agrandit le SVG et le premier groupe `g` sert à faire des marges de 30px :
 ```
@@ -573,7 +573,7 @@ On inverse la courbe des `y` car en SVG, l'axe des `y` est tourné vers le bas :
 
 ## Ajout des axes, légendes…
 
-D3 offre un module pour créer les axes (`page12.html`); cela évite un travail fastidieux, d'autant que ces fonctions utilisent directement les échelles `d3.scale.…` pour avoir les bons réglages !
+D3 offre un module pour créer les axes ([`page12.html`](page12.html)); cela évite un travail fastidieux, d'autant que ces fonctions utilisent directement les échelles `d3.scale.…` pour avoir les bons réglages !
 
 Référence: [SVG-Axes](https://github.com/d3/d3/wiki/SVG-Axes)
 
@@ -618,7 +618,7 @@ et pour finir, ajouter et positionner le nom des axes:
 
 Essayons maintenant de changer la valeur de la variable `t`: `var t = 1960;` et `var t = 2015;` nous donnent des graphes très différents.
 
-On va rendre cela paramétrable depuis la page.
+On va rendre cela paramétrable depuis la page ([`page13.html`](page13.html)).
 
 Tout d'abord, cela implique de définir un nouvel « état » de l'information. Le plus simple est que cet état soit défini comme l'état d'un élément de la page. L'élément le plus indiqué est un _slider_ (thermomètre ou tirette).
 ```
@@ -648,11 +648,11 @@ Il s'agit maintenant de mettre à jour les données en fonction de l'année cour
 
 Pour cela, il faut reprendre tout le code et isoler ce qui sert la première fois (création des bulles), de ce qui sert en permanence (mise en place des variables visuelles de chacun des bulles).
 
-Ce reformatage est une opération moins difficile qu'il n'y paraît, mais il faut bien prendre garde à ne changer que ce qui dot changer. Ici les axes vont rester fixes, les bulles doivent changer de place et de forme, mais conserver la même couleur (`page14.html`).
+Ce reformatage est une opération moins difficile qu'il n'y paraît, mais il faut bien prendre garde à ne changer que ce qui dot changer. Ici les axes vont rester fixes, les bulles doivent changer de place et de forme, mais conserver la même couleur ([`page14.html`](page14.html)).
 
 # Animation automatique
 
-En cliquant sur la date, on va déclencher une animation automatique de la barre des dates, qu'on suspendra dès que l'utilisateur recliquera sur la tirette ou sur la date (`page15.html`).
+En cliquant sur la date, on va déclencher une animation automatique de la barre des dates, qu'on suspendra dès que l'utilisateur recliquera sur la tirette ou sur la date ([`page15.html`](page15.html)).
 
 On en profite pour faire quelques réglages supplémentaires :
 
