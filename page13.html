@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Page 1</title>
+
+    <style>
+        .axis {
+            shape-rendering: crispEdges;
+        }
+        
+        .axis path {
+            stroke: black;
+            fill: none;
+        }
+        
+        #annee {
+            margin-top: 30px;
+            margin-left: 30px;
+            width: 640px;
+            font-size: larger;
+            text-align: center;
+        }
+        
+        #annee input {
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <svg width=680 height=450>
+        <g transform="translate(30,30)"></g>
+    </svg>
+
+</body>
+
+<script src="./d3.min.js"></script>
+<script src="./queue.v1.js"></script>
+<script>
+    function nombre(x) {
+        if (!x) return null;
+        return +(x.replace(/,/g, ''));
+    }
+
+    queue()
+        .defer(d3.csv, 'population.csv')
+        .defer(d3.csv, 'richesse.csv')
+        .defer(d3.csv, 'sante.csv')
+        .await(function (error, population, richesse, sante) {
+            if (error) throw error;
+
+            var t = 2015;
+
+            var index = d3.map(); // 🌶
+
+
+            var cle = 'Total population';
+            var data = population
+                .map(function (d, i) {
+                    var nom = d[cle];
+                    index.set(nom, i);
+                    var e = {
+                        nom: nom,
+                        pop: nombre(d[t]),
+                    };
+                    return e;
+                });
+
+            var cle = 'Income per person (fixed 2000 US$)';
+            richesse.map(function (d) {
+                var nom = d[cle];
+                var i = index.get(nom); // 🌶
+                if (typeof i == 'number') { // 🌶
+                    var richesse = +d[t];
+                    if (!richesse) {
+                        var t2 = t;
+                        do { // 🌶
+                            richesse = +d[--t2];
+                        } while (t2 > 1950 && !richesse);
+                    }
+                    data[i].richesse = richesse;
+                }
+            });
+
+            var cle = 'Life expectancy with projections. Yellow is IHME';
+            sante.map(function (d) {
+                var nom = d[cle];
+                var i = index.get(nom);
+                if (typeof i == 'number') {
+                    var sante = +d[t];
+                    if (!sante) {
+                        var t2 = t;
+                        do {
+                            sante = +d[--t2];
+                        } while (t2 > 1950 && !sante);
+                    }
+                    data[i].sante = sante;
+                }
+            });
+
+            // eliminer les pays qui n'ont pas toutes les donnees
+            // et ceux qui sont trop petits
+            data = data.filter(function (d) {
+                return d.richesse > 0 && d.sante > 0 && d.pop > 100000;
+            });
+
+
+            var rayon = d3.scale.sqrt()
+                .domain([0, d3.max(data, function (d) {
+                    return d.pop;
+                })])
+                .range([0, 40]);
+
+            var x = d3.scale.log()
+                .domain(d3.extent(data, function (d) {
+                    return d.richesse;
+                }))
+                .range([0, 640]);
+
+            var y = d3.scale.linear()
+                .domain(d3.extent(data, function (d) {
+                    return d.sante;
+                }))
+                .range([400, 0]);
+
+            var categorie = d3.scale.category10();
+
+            var pays = d3.select('svg g')
+                .selectAll('circle')
+                .data(data);
+
+            pays
+                .enter()
+                .append('circle')
+                .attr({
+                    cx: function (d) {
+                        return x(d.richesse);
+                    },
+                    cy: function (d) {
+                        return y(d.sante);
+                    },
+                    r: function (d) {
+                        return rayon(d.pop);
+                    },
+                    fill: function (d) {
+                        return categorie(d.nom);
+                    },
+                })
+                .on('click', function (d) {
+                    var texte = d.nom + ': ' + d.pop;
+                    alert(texte);
+                    // d3.select(this).html( texte );
+                })
+                .append('title')
+                .text(function (d) {
+                    return d.nom;
+                });
+
+            // Axes
+            legendes = d3.select('svg>g')
+                .append('g');
+            var xAxis = d3.svg.axis()
+                .scale(x)
+                .orient("bottom")
+                .tickFormat(function (d, i) {
+                    if (i % 3 == 0) return d;
+                }),
+                yAxis = d3.svg.axis()
+                .orient("left")
+                .scale(y)
+                .ticks(8);
+
+            legendes.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + 400 + ")")
+                .call(xAxis)
+                .append('text')
+                .text('PIB par habitant')
+                .attr({
+                    transform: 'translate(640,-8)',
+                    'text-anchor': 'end'
+                });
+
+            legendes.append("g")
+                .attr("class", "y axis")
+                .attr("transform", "translate(0,0)")
+                .call(yAxis)
+                .append('text')
+                .text('Espérance de vie à la naissance')
+                .attr({
+                    transform: 'translate(5,8)',
+                    'text-anchor': 'start'
+                });
+
+
+
+        });
+    d3.select('body')
+        .append('div')
+        .attr('id', 'annee')
+        .html('<input type=range value=2015 min=1950 max=2015 step=1><div></div>');
+
+    function annee() {
+        return d3.select("#annee input")[0][0].value;
+    }
+
+    function affiche_annee() {
+        d3.select("#annee div").html(annee());
+    }
+    affiche_annee();
+    d3.select('#annee input').on('input', function () {
+        affiche_annee();
+    })
+</script>
+
+</html>
