@@ -28,7 +28,6 @@
         .defer(d3.csv, 'sante.csv')
         .await(function (error, population, richesse, sante) {
             if (error) throw error;
-            console.log(population.slice(0, 10), richesse.slice(0, 10), sante.slice(0, 10));
 
             var t = 2015;
 
@@ -92,26 +91,34 @@
                 })])
                 .range([0, 200]);
 
-            data2 = data
-                .sort(function (a, b) {
-                    return d3.descending(a.pop, b.pop);
-                })
-                .filter(function (d) {
-                    return rayon(d.pop) > 5;
-                });
+            var x = d3.scale.log()
+                .domain(d3.extent(data, function (d) {
+                    return d.richesse;
+                }))
+                .range([0, 640]);
+
+            var y = d3.scale.linear()
+                .domain(d3.extent(data, function (d) {
+                    return d.sante;
+                }))
+                .range([0, 400]);
 
             var categorie = d3.scale.category10();
 
             var pays = d3.select('svg g')
                 .selectAll('circle')
-                .data(data2);
+                .data(data);
 
             pays
                 .enter()
                 .append('circle')
                 .attr({
-                    cx: 0,
-                    cy: 0,
+                    cx: function (d) {
+                        return x(d.richesse);
+                    },
+                    cy: function (d) {
+                        return y(d.sante);
+                    },
                     r: function (d) {
                         return rayon(d.pop);
                     },
