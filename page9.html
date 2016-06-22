@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Page 1</title>
+</head>
+
+<body>
+
+    <svg width=640 height=400>
+        <g transform="translate(320,200)"></g>
+    </svg>
+
+</body>
+
+<script src="./d3.min.js"></script>
+<script src="./queue.v1.js"></script>
+<script>
+    function nombre(x) {
+        if (!x) return null;
+        return +(x.replace(/,/g, ''));
+    }
+
+    queue()
+        .defer(d3.csv, 'population.csv')
+        .defer(d3.csv, 'richesse.csv')
+        .defer(d3.csv, 'sante.csv')
+        .await(function (error, population, richesse, sante) {
+            if (error) throw error;
+            console.log(population.slice(0, 10), richesse.slice(0, 10), sante.slice(0, 10));
+
+            var t = 2015;
+
+            var index = d3.map(); // 🌶
+
+            var data = population
+                .map(function (d, i) {
+                    var nom = d['Total population'];
+                    index.set(nom, i);
+                    var e = {
+                        nom: nom,
+                        pop: nombre(d[t]),
+                    };
+                    return e;
+                });
+
+            var key = 'Income per person (fixed 2000 US$)';
+            richesse.map(function (d) {
+                var nom = d[key];
+                var i = index.get(nom); // 🌶
+                if (typeof i == 'number') { // 🌶
+                    var richesse = +d[t];
+                    if (!richesse) {
+                        var t2 = t;
+                        do { // 🌶
+                            richesse = +d[--t2];
+                            if (nom == 'China') console.log(t2, d[t2]);
+                        } while (t2 > 1950 && !richesse);
+                    }
+                    data[i].richesse = richesse;
+                }
+            });
+
+            var key = 'Life expectancy with projections. Yellow is IHME';
+            sante.map(function (d) {
+                var nom = d[key];
+                var i = index.get(nom);
+                if (typeof i == 'number') {
+                    var sante = +d[t];
+                    if (!sante) {
+                        var t2 = t;
+                        do {
+                            sante = +d[--t2];
+                        } while (t2 > 1950 && !sante);
+                    }
+                    data[i].sante = sante;
+                }
+            });
+
+            // eliminer les pays qui n'ont pas toutes les donnees
+            // et ceux qui sont trop petits
+            data = data.filter(function (d) {
+                return d.richesse > 0 && d.sante > 0 && d.population > 100000;
+            });
+
+
+            var rayon = d3.scale.sqrt()
+                .domain([0, d3.max(data, function (d) {
+                    return d.pop;
+                })])
+                .range([0, 200]);
+
+            data2 = data
+                .sort(function (a, b) {
+                    return d3.descending(a.pop, b.pop);
+                })
+                .filter(function (d) {
+                    return rayon(d.pop) > 5;
+                });
+
+            var categorie = d3.scale.category10();
+
+            var pays = d3.select('svg g')
+                .selectAll('circle')
+                .data(data2);
+
+            pays
+                .enter()
+                .append('circle')
+                .attr({
+                    cx: 0,
+                    cy: 0,
+                    r: function (d) {
+                        return rayon(d.pop);
+                    },
+                    fill: function (d) {
+                        return categorie(d.nom);
+                    },
+                })
+                .on('click', function (d) {
+                    var texte = d.nom + ': ' + d.pop;
+                    alert(texte);
+                    // d3.select(this).html( texte );
+                });
+        });
+</script>
+
+</html>

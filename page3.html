@@ -15,7 +15,7 @@
         return +(x.replace(/,/g, ''));
     }
 
-    d3.csv('indicator gapminder population - Data.csv', function (data) {
+    d3.csv('population.csv', function (data) {
         data2 = data
             .map(function (d) {
                 var e = {
