@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>Page 15</title>
+    <title>Page 14</title>
 
     <style>
         .axis {
@@ -25,11 +25,6 @@
         
         #annee input {
             width: 100%;
-        }
-        
-        circle {
-            stroke: white;
-            stroke-width: 0.6;
         }
     </style>
 </head>
@@ -129,10 +124,6 @@
         var t = annee();
 
         pays
-            .transition()
-            .delay(0)
-            .duration(300)
-            .ease('linear')
             .attr({
                 cx: function (d) {
                     return x(valeur(d.richesse, t));
@@ -146,6 +137,15 @@
                 fill: function (d) {
                     return categorie(d.nom);
                 },
+            })
+            .on('click', function (d) {
+                var texte = d.nom + ': ' + d.population;
+                alert(texte);
+                // d3.select(this).html( texte );
+            })
+            .append('title')
+            .text(function (d) {
+                return d.nom;
             });
     }
 
@@ -158,10 +158,6 @@
 
             var data = create_data(population, richesse, sante);
 
-            data.sort(function (a, b) {
-                return d3.descending(a.pop, b.pop);
-            });
-
             rayon
                 .domain([0, d3.max(data, function (d) {
                     return d3.max(d3.values(d.population).map(nombre));
@@ -170,7 +166,7 @@
             x.domain([100, d3.max(data, function (d) {
                 return d3.max(d3.values(d.richesse).map(nombre));
             })]);
-            y.domain([35, d3.max(data, function (d) {
+            y.domain([30, d3.max(data, function (d) {
                 return d3.max(d3.values(d.sante).map(nombre));
             })]);
 
@@ -179,17 +175,7 @@
                 .selectAll('circle')
                 .data(data)
                 .enter()
-                .append('circle')
-                .on('click', function (d) {
-                    var texte = d.nom;
-                    alert(texte);
-                });
-
-            pays
-                .append('title')
-                .text(function (d) {
-                    return d.nom;
-                });
+                .append('circle');
 
             update();
 
@@ -238,44 +224,19 @@
         .attr('id', 'annee')
         .html('<input type=range value=2015 min=1950 max=2015 step=1><div></div>');
 
-
-    var autoplay = false;
-    d3.select("#annee div")
-        .on('click', function () {
-            if (autoplay) {
-                clearInterval(autoplay);
-                autoplay = false;
-                affiche_annee();
-                update();
-            } else {
-                autoplay = setInterval(function () {
-                    var a = annee() + 1;
-                    if (a > 2015) a = 1950;
-                    d3.select("#annee input")[0][0].value = a;
-                    affiche_annee();
-                    update();
-                }, 300);
-            }
-        });
-
-
     function annee() {
-        return parseInt(d3.select("#annee input")[0][0].value);
+        return d3.select("#annee input")[0][0].value;
     }
 
     function affiche_annee() {
-        d3.select("#annee div").html(annee() + " " + (autoplay ? "| |" : "|&gt;"));
+        d3.select("#annee div").html(annee());
     }
     affiche_annee();
-    d3.select('#annee input')
-        .on('input', function () {
-            if (autoplay) {
-                clearInterval(autoplay);
-                autoplay = false;
-            }
-            affiche_annee();
-            update();
-        });
+    d3.select('#annee input').on('input', function () {
+        affiche_annee();
+        update();
+    });
+
 </script>
 
 </html>
