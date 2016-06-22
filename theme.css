@@ -1,0 +1,14 @@
+html {
+  background: #eee;
+}
+
+body {
+  margin: 2em;
+  padding: 1em;
+  max-width: 60em;
+  background: white;
+}
+
+h1 {
+  font-size: 1.3em;
+}
