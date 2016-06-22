@@ -1,0 +1,670 @@
+{{TOC}}
+
+# Vidéo
+
+Hans Rosling's 200 Countries, 200 Years, 4 Minutes - The Joy of Stats - BBC Four-jbkSRLYSojo.mp4
+
+# Données
+Les données de cette vidéo sont disponibles sur le site de Gapminder.
+Source: https://www.gapminder.org/data/
+
+En fouillant un peu on trouve les documents suivants, que l’on peut télécharger au format CSV.
+
+## GDP per capita
+https://docs.google.com/spreadsheets/d/1RctTQmKB0hzbm1E8rGcufYdMshRdhmYdeL29nXqmvsc/pub?gid=0
+http://spreadsheets.google.com/pub?key=1RctTQmKB0hzbm1E8rGcufYdMshRdhmYdeL29nXqmvsc&output=csv
+
+## Total population
+https://docs.google.com/spreadsheets/d/1IbDM8z5XicMIXgr93FPwjgwoTTKMuyLfzU6cQrGZzH8/pub?gid=0
+http://spreadsheets.google.com/pub?key=1IbDM8z5XicMIXgr93FPwjgwoTTKMuyLfzU6cQrGZzH8&output=csv
+
+## Life expectancy at birth
+https://docs.google.com/spreadsheets/d/1H3nzTwbn8z4lJ5gJ_WfDgCeGEXK3PVGcNjQ_U5og8eo/pub?gid=0
+http://spreadsheets.google.com/pub?key=1H3nzTwbn8z4lJ5gJ_WfDgCeGEXK3PVGcNjQ_U5og8eo&output=csv
+
+On observe la structure de ces fichiers : quelle est la « clé primaire » ? Comment sont renseignées les données ?
+
+# Découverte de d3.js
+
+Le site d3js.org montre une panoplie d'exemples. Observer, discuter. L'histoire de D3 est assez intéressante aussi pour nous journalistes et auteurs de logiciels libres.
+
+# Utiliser Github, gists, bl.ocks.org et blockbuilder.org
+
+Pour bien travailler sur le Web il faut en général un serveur, un éditeur de texte, etc. On souhaite aussi conserver une trace (un historique) de tout ce que l'on fait, pouvoir faire des modifications et voir les résultats rapidement.
+
+Une approche est d'utiliser un site comme Github, dans lequel on a pouvoir créer des petits projets qui seront immédiatement visibles, modifiables en ligne, versionnés et archivés.
+
+Sans entrer dans les détails, le mieux est d'essayer tout de go: 
+http://blockbuilder.org/
+
+Ce site est connecté à tout l'écosystème de `d3.js`.
+
+Voir ensuite comment créer un compte Github, un gist, et faire le lien entre bl.ocks.org, gists et blockbuilder.
+
+Le bookmarklet s'avère très pratique !
+
+
+# Charger les données dans une page web
+
+Pour charger des données dans une page web, il faut passer par le langage Javascript.
+
+Commençons tout de suite par une structure de page Web classique, contenant deux scripts (`page1.html`). L’un est d3.js, l’autre un script personnalisable, dans lequel on va pouvoir développer.
+
+Dans ce script, commençons tout de suite par charger nos données :
+
+```
+d3.csv('indicator gapminder population - Data.csv', function(data) {
+    console.log(data);
+});
+```
+
+On observe :
+1. La page reste vide
+2. On ouvre l’inspecteur
+3. il faut que `d3.min.js` soit présent
+4. Si tout se passe bien, les données apparaissent dans la console.
+
+### Que s’est-il passé ?
+
+#### `d3.csv`
+`d3.csv` est une fonction de d3 qui facilite la lecture des fichiers au format CSV.
+Elle demande au navigateur de charger le fichier dont on lui a donné l’adresse.
+Elle analyse ensuite le contenu du fichier (un long texte avec des virgules et des sauts de ligne), pour le transformer en une structure de données.
+Elle appelle ensuite une fonction de rappel.
+#### Fonction de rappel
+Aussi nommée « callback », cette fonction est appelée une fois que `d3.csv` a fini de charger et d’analyser les données. Elle passe alors cette structure de données comme argument pour notre fonction.
+À l’intérieur de la fonction de rappel, la structure de données est accessible via la variable `data`.
+La fonction de rappel est ici une « fonction anonyme », elle est définie localement, pour un usage unique.
+Cette fonction fait une seule chose : elle envoie la variable reçue à la fonction `console.log`.
+
+On observe les données telles qu’elles sont affichées dans la console.
+
+1. Cela se présente sous la forme d’une liste d’objets Javascript (`object`)
+2. Chaque objet est une structure comportant plusieurs attributs, dont les clés sont les années (1950 à 2015); une clé supplémentaire est « Total population ».
+3. Les valeurs sont parfois vides (`""`); parfois un nombre entre guillemets (`"23098"`).
+4. Quant au champ « Total population », il contient le nom du pays ! C’est parce que notre CSV n’est pas parfaitement normé. On fera un nouvel ajustement.
+
+
+*À noter : Formats de fichiers.*
+- d3 offre des outils pour ouvrir d’autres formats de fichiers pour des données structurées : les principaux sont XML, CSV (et ses variantes TSV de DSV), et JSON. On ne peut pas ouvrir directement un fichier Excel ou LibreOffice.
+- Mais ce n’est pas une liste limitative pour autant. Les navigateurs modernes permettent d’ouvrir beaucoup d’autres types de fichiers. Des images bien sûr (avec les technologies SVG ou canvas), mais aussi des fichiers sons ou vidéo, pour faire du traitement ou des visualisations en direct.
+- Exemple de traitement d'image : http://bl.ocks.org/mbostock/0d20834e3d5a46138752f86b9b79727e
+- Exemple de traitement de son avec Audio API : http://bl.ocks.org/eesur/6ad4ee84c81b664353a7
+
+
+
+# Nettoyer et préparer les données
+
+Comme on a vu précédemment, les données nous arrivent sous forme de nombres entre guillemets. Il va falloir convertir ces valeurs en nombres.
+
+Javascript propose plusieurs méthodes pour cela : explicitement `parseInt(x)` retournera le nombre entier indiqué dans la chaîne de caractère `x`, et `parseFloat(x)` la même chose pour un nombre à virgule.
+
+Mais le plus simple est souvent d’utiliser la conversion automatique des types : la notation `+x` transforme la chaîne `x` en nombre.
+
+En observant nos données de plus près, on remarque que parfois un nombre comporte une virgule (`"10,889"`) — c’est le cas du champ 1953 pour l’objet 2 ; or ici ce n'est pas un « nombre à virgule » (d'ailleurs en notation anglaise la virgule décimale serait rendue par un point), mais simplement une mauvaise saisie.
+
+Bien sûr on pourrait retourner dans le fichier source et corriger l'information, mais dans ce cas-ci nous ne pouvons pas y écrire, seulement lire.
+
+Une manière de convertir en tenant compte de ces deux problèmes est la suivante :
+```
+function nombre(x) {
+    if (!x) return null;
+    return +(x.replace(/,/g, ''));
+}
+```
+
+La première ligne renvoie `null` si la variable `x` est vide ; la seconde convertit son contenu en nombre, après avoir supprimé d'éventuelles virgules.
+
+Nous sommes maintenant prêts à nettoyer nos données.
+
+Commençons par récupérer pour chaque pays, son nom, et sa population à la date 2015 (`page2.html`).
+
+Dans la fonction de rappel de `d3.csv`, on va traiter la liste de données `data` avec la méthode `.map()`. Cette méthode emploie une autre fonction de rappel, à laquelle elle passe un par un les objets de notre liste. Et elle compose une autre liste avec les valeurs renvoyées par cette fonction.
+
+```
+    data2 = data
+    .map(function(d) {
+        var e = {
+            nom: d['Total population'],
+            pop2015: nombre(d[2015]),
+        };
+        return e;
+    });
+    console.log(data2);
+```
+
+Maintenant que les données sont chargées et analysées, il devient possible d'en faire quelque chose.
+
+Commençons par les trier, puis prendre les dix plus gros pays, et les afficher à l'écran.
+```
+    data2 = data2.sort(function(a,b) {
+        return d3.descending(a.pop2015, b.pop2015);
+    })
+    .slice(0,10)
+    .forEach(function(d) {
+        d3.select('body')
+          .append('p')
+          .html(d.nom+': '+d.pop2015);
+    })
+    ;
+```
+
+La fonction de tri est un peu compliquée : elle appelle une fonction de d3 qui renvoie 1, 0 ou -1 selon l'ordre des valeurs qu'on lui passe. C'est l'équivalent de :
+```
+if (a.pop2015 < b.pop2015) return -1;
+if (a.pop2015 > b.pop2015) return 1;
+return 0; // cas de l'égalité entre les deux valeurs
+```
+
+Note: On peut remplacer `d3.descending` par `d3.ascending` si on veut trier dans l'ordre croissant.
+
+`.slice(0,10)` nous permet de ne prendre que 10 valeurs en partant de la première (index = 0).
+
+`.forEach(…)` va faire une boucle sur la liste des 10 résultats, et les passer un par à sa fonction de rappel.
+
+Celle-ci utilise `d3.select` pour identifier le `body` de la page Web, lui rajouter un élément `p` (paragraphe), et lui mettre la chaîne de caractères (nom + population) comme contenu HTML.
+
+
+
+## Jointure de données (data-binding)
+
+Cette méthode de création de nos éléments visuels (ici, des paragraphes), est un peu fruste. En effet, si on modifie nos données (par exemple en changeant l'année de référence), les paragraphes ne vont pas se modifier…
+
+Or c’est là que `d3` devient puissant : il propose un ensemble de techniques, qui permettent de créer des animations visuelles, ou proposer de l'interaction à l'utilisateur. Et pour cela, il faut tout d'abord lier les données aux éléments visuels.
+
+Cette méthode consiste à remplacer le code précédent par la construction un peu plus abstraite que voici.
+
+```
+        var pays = d3.select('body')
+            .selectAll('p')
+            .data(data2);
+
+        pays
+            .enter()
+            .append('p');
+
+        pays
+            .html(function (d) {
+                return d.nom + ': ' + d.pop2015;
+            });
+```
+
+### Qu'est-ce qui s'est passé ?
+- `forEach` a disparu : c'est désormais `d3` qui s'occupe de gérer les listes, les boucles etc.
+- `d3.select('body')` est fait au début, et non dans la boucle : on se positionne d'abord sur le « conteneur » dans lequel se trouveront nos éléments représentant les données.
+- `.selectAll('p')` demande à `d3` de faire une sélection de tous les paragraphes se trouvant dans notre conteneur. Pour l'instant il n'y en a aucun, notre sélection est purement virtuelle.
+- `.data(data2)` relie nos données à cette sélection virtuelle. C'est le _data-binding_ : cela indique à `d3` qu'on veut avoir un élément `p` par élément de la liste de données `data2`.
+
+À partir de là, `d3` crée un objet (que l'on mémorise dans la variable `pays`), qui contient plusieurs sous-sélections. Ces sous-sélections vont nous permettre de synchroniser nos données avec les éléments du graphique.
+- `pays`, la sélection initiale des éléments qui sont déjà là (vide);
+- `pays.enter()` liste les éléments qui viennent d'arriver et qu'il faut créer;
+- `pays.exit()` liste les éléments qui viennent de partir et qu'il faut supprimer.
+
+Pour le moment, nous n'avons que des éléments à créer. (La sélection initiale est vide, et il n'y a aucun élément qui aurait disparu.)
+
+La séquence ci-dessous crée les éléments en question.
+
+```
+    pays.enter()
+        .append('p')
+```
+
+La séquence qui suit applique une fonction de rappel à chacun des éléments. La fonction de rappel reçoit la _donnée associée_ à l'élément, et le résultat est envoyé dans son code HTML.
+
+```
+    pays.html(function (d) {
+        return d.nom + ': ' + d.pop2015;
+    })
+```
+
+Le point le plus important est celui-ci : les données sont désormais enregistrées en tant que telles dans les éléments visuels qui les représentent. Le lien créé est solide et permet toutes les manipulations. Et si l'on modifie les données, l'opération `data()` sait conserver ces liaisons.
+
+
+# Un exemple (simpliste) d'interaction avec les données
+
+Dans cet exemple (`page4.html`), on modifie simplement la création des éléments `p` :
+
+```
+        pays
+            .enter()
+            .append('p');
+            .html(function(d,i) {
+               return 'pays numéro ' + i;
+            })
+            .on('click', function (d) {
+                var texte = d.nom + ': ' + d.pop2015;
+                alert( texte );
+                this.innerHTML = texte;
+            });
+
+```
+
+Que s'est-il passé ? Simplement, lors de la création du paragraphe, on lui donne un code HTML qui indique le rang du pays, et on écoute l'événement "click".
+
+Si un click est réalisé, la callback est appelée, elle reçoit comme argument `d`, la donnée associée à l'élément cliqué.
+`var texte = d.nom + ': ' + d.pop2015; alert( texte );` montre ces données.
+
+`this` permet de retrouver l'élément lui-même, et de le manipuler avec du Javascript normal. Pour un code plus homogène, on peut remplacer cette ligne par `d3.select(this).html( texte );`
+
+### Observer
+Avec l'inspecteur, observer les attributs de nos paragraphes, et retrouver l'endroit où sont enregistrées les données liées aux éléments `p`.
+
+
+# Visualisation graphique
+
+Après les paragraphes, on va représenter nos données avec des ronds. Pour cela il faut d'abord apprendre à utiliser SVG.
+
+SVG (pour “scalable vector graphics”) est un format similaire à HTML, où l'on trouve des balises emboîtées les unes dans les autres. Ces balises ne représentent pas des paragraphes et des titres, mais des ronds, des traits, des carrés, des surfaces…
+
+Les éléments suivants nous seront utiles :
+- `<svg>`: conteneur principal de notre image
+	- attributs importants: `width`, `height` (largeur et hauteur)
+- `<g>`: groupe d'élements, (aussi appelé « couche » ou « calque » dans le langage des logiciel de graphisme)
+	- attributs importants: `transform: translate(x,y)` (déplacer ce groupe de x pixels vers la droite et y vers le bas, à partir du point (0,0) en haut à gauche).
+- `<circle>`: un cercle, ou un disque
+	- attributs importants: `r` (rayon); `cx, cy` (coordonnées du centre); `fill` (couleur de remplissage); `stroke` (couleur de contour).
+
+SVG en propose bien d'autres : `<line>`: plusieurs points reliés par une ligne, `<rect>`: rectangle (ou carré), etc.
+
+Chaque élément graphique de SVG peut être modifié, déplacé, mis à l'échelle, colorié etc, par simple modification des ses attributs ou de son style CSS.
+
+La `page5.html` donne un exemple de contenu SVG.
+
+Observer le code et manipuler les attributs des différents éléments dans l'inspecteur pour voir comment ils affectent le graphique.
+
+
+# Visualisation graphique de nos données
+
+Pour faire un graphique avec nos données, il suffit dès lors de combiner les techniques de data-binding de `d3` avec le format SVG. Ce qui est fait `page6.html`
+
+```
+    <svg width=640 height=400>
+        <g transform="translate(320,200)"></g>
+    </svg>
+```
+
+Ce morceau de notre page Web définit un SVG, avec un calque positionné en son centre.
+
+```
+        pays
+            .enter()
+            .append('circle')
+            .attr({
+                cx: 0,
+                cy: 0,
+                r: function (d) {
+                    return 0.005 * Math.sqrt(d.pop2015);
+                },
+                fill: 'transparent',
+                stroke: 'red',
+            })
+```
+
+Ici au lieu d'ajouter un `p`on ajoute un cercle, dont le rayon est proportionnel à la racine carrée de la population en 2015. On le rend transparent avec une bordure rouge.
+
+Sans aucun changement, le code qui rendait nos paragraphes clicables rend désormais nos ronds clicables : l'interaction avec SVG se programme exactement comme celle avec HTML.
+
+# Les échelles
+
+Un bout du code précédent s'avère particulièrement sale :
+`return 0.005 * Math.sqrt(d.pop2015);`
+
+En effet, il présuppose plusieurs choses: 
+1. que l'on sait dans quelle étendue se trouvent les valeurs de la population (astuce : quel est le pays le plus peuplé?);
+2. Que l'on veut une racine carrée (pour que la surface du disque qui figure une population soit proportionnelle à la population : surface = πr^2^);
+3. que l'on sait en combien de pixels on doit transformer chaque valeur.
+
+Mais observons le rôle de ce bout de code : il s'agit de transformer une dimension numérique en une variable visuelle.
+
+Jacques Bertin, le fameux géographe, avait déterminé de façon scientifique l'ensemble des variables visuelles qu'il était possible d'activer sur un graphique.
+
+Ces dimensions sont les suivantes :
+- X et Y (les deux dimensions du plan)
+- TAILLE
+- VALEUR (intensité du clair au foncé)
+- GRAIN (texture)
+- COULEUR
+- ORIENTATION (vers le haut, le bas, angle de 30°…)
+- FORME (carré, rond, triangle…)
+
+Le rayon de notre cercle (`r`) correspond à la variable visuelle TAILLE. Le bout de code ci-dessus est une fonction qui permet d'affecter une variable visuelle à une dimension des données.
+
+`d3` généralise ce principe en définissant des _échelles_ (_scales_), qui ont un domaine (en entrée, _domain_) et une étendue (en sortie, _range_), et convertissent donc des information de leur dimension « données » à leur dimension « visuelle ».
+
+Ainsi par exemple on écrirait de préférence :
+
+```
+        var rayon = d3.scale.sqrt()
+            .domain([ 0, d3.max(data2, function(d) {
+                return d.pop2015;
+            }) ])
+            .range([ 0, 200 ]);
+```
+
+et puis, plus bas :
+```
+           .attr({
+                r: function(d) {
+                    return rayon(d.pop2015);
+                },
+```
+
+Notre graphique est alors défini par des données, qui sont liées à des éléments du SVG (ou du HTML) ; des échelles permettent de définir, pour chaque élément, les variables visuelles qui lui correspondent.
+
+Plusieurs types d'échelles sont proposés de façon standard par `d3`; linéaire, logarithmique, à seuils ; mais aussi des échelles de temps (prenant en compte les jours, mois, heure d'hiver etc), ou encore de couleur, où l'étendue n'est pas un nombre mais un code de couleur HTML.
+
+Une échelle très pratique est `d3.scale.category10()`. On la découvre `page8.html`. Elle prend en domaine n'importe quelle valeur (ici, le nom du pays), et son étendue est une liste de 10 couleurs, qu'elle parcourt dans l'ordre.
+
+```
+       var categorie = d3.scale.category10();
+…/…
+       … .attr({
+                r: function (d) {
+                    return rayon(d.pop2015);
+                },
+                fill: function (d) {
+                    return categorie(d.nom);
+                },
+```
+
+Le code suivant vise à sélectionner les ronds dont le rayon serait au moins de 5 pixels; on filtre donc les données _par rapport à une variable visuelle_:
+```
+     data2 = data2.filter(function (d) {
+                return rayon(d.pop2015) > 5;
+            });
+```
+
+
+# Sur ces principes, construisons notre graphique
+
+On voit que la construction du graphique se ramène à deux questions :
+
+Quelles sont les variables visuelles dont nous avons besoin pour la visualisation des pays ? Comment les calculer ?
+
+Comment trouver leurs valeurs ? (Quelles sont les dimensions des données qui leur correspondent ? Comment les récupérer ?)
+
+
+### Liste des variables visuelles, des données correspondantes, et définition des échelles.
+- nom du pays => texte en survol (pas d'échelle)
+- population => rayon, échelle en racine carrée
+- abscisse => richesse du pays (PIB per capita), échelle logarithmique
+- ordonnée => espérance de vie (en années), échelle linéaire
+
+
+### Liste des dimensions à extraire des données
+- nom du pays (placé dans la première colonne de chaque fichier CSV)
+- population (valeur à l'année t, fichier `population.csv`)
+- PIB per capita (valeur à l'année t, fichier `richesse.csv`)
+- espérance de vie (valeur à l'année t, fichier `sante.csv`)
+
+Après une telle analyse, on se rend compte que notre graphique peut être conçu indépendamment des fichiers de données !
+
+
+Néanmoins il va falloir plonger un peu le nez dedans, et on s'aperçoit très vite que la difficulté est qu'on n'a pas un fichier de données, mais trois. La _callback_ de `d3.csv()` ne suffit donc pas à obtenir toutes les données dont nous avons besoin.
+
+Une solution serait d'empiler trois callbacks de cette manière :
+```
+d3.csv('population.csv', function(population) {
+    d3.csv('richesse.csv', function(richesse) {
+       d3.csv('sante.csv', function(sante) {
+           // ici faire quelque chose avec les trois
+           // variables population, richesse, sante
+       });
+   });
+});
+```
+
+Cette approche fonctionne mais n'est pas idéale, car elle attend la fin du chargement d'un fichier pour lancer le second chargement, puis le troisième. Par ailleurs c'est un peu « laid ».
+
+Mais `d3` fournit [d3-queue](https://github.com/d3/d3-queue), un outil qui permet de charger de façon parallèle plusieurs fichiers (`page9.html`) et d'attendre que tous soient arrivés pour lancer une fonction de rappel:
+
+`<script src="./queue.v1.js"></script>`
+
+```
+    queue()
+        .defer(d3.csv, 'population.csv')
+        .defer(d3.csv, 'richesse.csv')
+        .defer(d3.csv, 'sante.csv')
+        .await(function (error, population, richesse, sante) {
+            if (error) throw error;
+            console.log(population, richesse, sante);
+```
+
+On voit que cette fonction nous permet un éventuel contrôle d'erreur (variable `error`), puis appelle notre callback avec les données rangées dans l'ordre dans lequel on les a déclarées.
+
+Il ne reste plus qu'à traiter ces données pour constituer notre série statistiques à la date `t`.
+
+Là apparaissent plusieurs difficultés: d'une part nos séries de données sont incomplètes (on n'a pas le PIB par habitant en 2015, mais seulement en 2011). D'autre part la liste des pays n'est pas forcément la même.
+Bref, le nettoyage des données risque de nous faire mal à la tête.
+
+On applique du code qui nettoie et qui met tout ce qu'il faut dans un grande liste `data` (difficultés signalées par `🌶`).
+
+```
+var t = 2015;
+
+var index = d3.map(); // 🌶
+
+var cle = 'Total population';
+var data = population
+    .map(function (d, i) {
+        var nom = d[cle];
+        index.set(nom, i);
+        var e = {
+            nom: nom,
+            pop: nombre(d[t]),
+        };
+        return e;
+    });
+
+var cle = 'Income per person (fixed 2000 US$)';
+richesse.map(function (d) {
+    var nom = d[cle];
+    var i = index.get(nom); // 🌶
+    if (typeof i == 'number') { // 🌶
+        var richesse = +d[t];
+        if (!richesse) {
+            var t2 = t;
+            do { // 🌶
+                richesse = +d[--t2];
+                if (nom == 'China') console.log(t2, d[t2]);
+            } while (t2 > 1950 && !richesse);
+        }
+        data[i].richesse = richesse;
+    }
+});
+
+… (même chose pour la dimension santé) …
+
+// eliminer les pays qui n'ont pas toutes les donnees
+// et ceux qui sont trop petits
+data = data.filter(function (d) {
+    return d.richesse > 0 && d.sante > 0 && d.population > 100000;
+});
+```
+
+
+# Créer les échelles
+
+Maintenant que nous avons notre liste de données à afficher, et avons extrait les dimensions, nous pouvons créer les échelles pour les transformer en variables visuelles (`page10.html`).
+
+### nom du pays
+=> texte en survol (pas d'échelle)
+on utilisera ici simplement un `<title>` en SVG, avec sa syntaxe particulière.
+
+### population
+=> rayon, échelle en racine carrée
+```
+var rayon = d3.scale.sqrt()
+    .domain([0, d3.max(data, function (d) {
+        return d.pop;
+    })])
+    .range([0, 200]);
+```
+### abscisse (x)
+=> richesse du pays (PIB per capita), échelle logarithmique
+```
+var x = d3.scale.log()
+    .domain(d3.extent(data, function (d) {
+        return d.richesse;
+    }))
+    .range([0, 640]);
+```
+### ordonnée
+=> espérance de vie (en années), échelle linéaire
+```
+var y = d3.scale.linear()
+    .domain(d3.extent(data, function (d) {
+        return d.sante;
+    }))
+    .range([0, 400]);
+```
+
+### couleur
+```
+var categorie = d3.scale.category10();
+```
+
+On applique alors ces variables visuelles
+```
+    .attr({
+        cx: function (d) {
+            return x(d.richesse);
+        },
+        cy: function (d) {
+            return y(d.sante);
+        },
+        r: function (d) {
+            return rayon(d.pop);
+        },
+        fill: function (d) {
+            return categorie(d.nom);
+        },
+    })
+```
+
+c'est un peu le bazar, mais on retrouve bien nos pays !
+
+Dans la `page11.html`, on fait quelques tout petits ajustements :
+
+On agrandit le SVG et le premier groupe `g` sert à faire des marges de 30px :
+```
+-    <svg width=640 height=400>
+-        <g transform="translate(320,200)"></g>
++    <svg width=680 height=420>
++        <g transform="translate(30,30)"></g>
+```
+
+Le rayon des cercles devient moins délirant :
+```
+          rayon …
+-                .range([0, 200]);
++                .range([0, 40]);
+```
+
+On inverse la courbe des `y` car en SVG, l'axe des `y` est tourné vers le bas :
+```
+          y …
+-                .range([0, 400]);
++                .range([400, 0]);
+```
+
+
+## Ajout des axes, légendes…
+
+D3 offre un module pour créer les axes (`page12.html`); cela évite un travail fastidieux, d'autant que ces fonctions utilisent directement les échelles `d3.scale.…` pour avoir les bons réglages !
+
+Référence: [SVG-Axes](https://github.com/d3/d3/wiki/SVG-Axes)
+
+
+Prévoir le style de nos axes :
+```
+<style>
+    .axis path {
+        stroke: black;
+        fill: none;
+    }
+</style>
+```
+
+créer l'axe des `y`:
+```
+var yAxis = d3.svg.axis()
+    .scale(y)
+    .ticks(8)
+    .orient("left")
+```
+
+et l'appliquer sur le graphe
+```
+.append("g")
+    .attr("class", "y axis")
+    .attr("transform", "translate(0,0)")
+    .call(yAxis)
+```
+
+et pour finir, ajouter et positionner le nom des axes:
+```
+.append('text')
+    .text('PIB par habitant')
+    .attr({
+        transform: 'translate(640,-8)',
+        'text-anchor': 'end'
+    })
+```
+
+### Paramétrer le graphe en fonction de l'année !
+
+Essayons maintenant de changer la valeur de la variable `t`: `var t = 1960;` et `var t = 2015;` nous donnent des graphes très différents.
+
+On va rendre cela paramétrable depuis la page.
+
+Tout d'abord, cela implique de définir un nouvel « état » de l'information. Le plus simple est que cet état soit défini comme l'état d'un élément de la page. L'élément le plus indiqué est un _slider_ (thermomètre ou tirette).
+```
+<input type=range value="2015" min="1950" max="2015" step="1">
+```
+et on lit sa valeur comme suit :
+```
+d3.select("input[type=range]")[0].value
+```
+
+On met tout cela dans deux fonctions qui nous permettent de ne plus nous en soucier. La première, qui ajoute le slider à la page, la seconde qui renvoie sa valeur.
+
+```
+d3.select('body')
+    .append('div')
+    .html('<input type=range value=2015 min=1950 max=2015 step=1>');
+function annee() {
+    return d3.select("input")[0][0].value;
+}
+```
+
+Avec un peu de CSS en plus, et une fonction qui relève le changement d'état et l'affiche, on a désormais une tirette qui affiche l'année !
+
+
+# Reformatage du code
+Il s'agit maintenant de mettre à jour les données en fonction de l'année courante.
+
+Pour cela, il faut reprendre tout le code et isoler ce qui sert la première fois (création des bulles), de ce qui sert en permanence (mise en place des variables visuelles de chacun des bulles).
+
+Ce reformatage est une opération moins difficile qu'il n'y paraît, mais il faut bien prendre garde à ne changer que ce qui dot changer. Ici les axes vont rester fixes, les bulles doivent changer de place et de forme, mais conserver la même couleur (`page14.html`).
+
+# Animation automatique
+
+En cliquant sur la date, on va déclencher une animation automatique de la barre des dates, qu'on suspendra dès que l'utilisateur recliquera sur la tirette ou sur la date (`page15.html`).
+
+On en profite pour faire quelques réglages supplémentaires :
+
+- un léger filet blanc autour des ronds (en CSS)
+```
+circle {
+    stroke: white;
+    stroke-width: 0.6;
+}
+```
+- on trie les pays par population décroissante, de manière à ce qu'on petit ne soit pas éclipsé par un gros 
+```
+data.sort(function(a,b) {
+    return d3.descending(a.pop, b.pop);
+});
+```
+
