@@ -238,16 +238,8 @@
                 .data(data)
                 .enter()
                 .append('circle')
-                .on('click', function (d) {
-                    var texte = d.nom;
-                    alert(texte);
-                });
-
-            pays
-                .append('title')
-                .text(function (d) {
-                    return d.nom;
-                });
+                .on('mouseover', tip.show)
+                .on('mouseout', tip.hide);
 
             update();
 
@@ -296,12 +288,6 @@
                     transform: 'translate(5,-16)',
                     'text-anchor': 'start',
                 });
-
-
-            pays
-                .on('mouseover', tip.show)
-                .on('mouseout', tip.hide);
-
 
         });
     d3.select('body')
