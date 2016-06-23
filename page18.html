@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>Page 16</title>
+    <title>Page 18</title>
 
     <style>
         .axis {
@@ -74,13 +74,21 @@
             top: 100%;
             left: 0;
         }
+        
+        path.timeline {
+            fill: none;
+            stroke-width: 0.3;
+        }
+        circle {
+            fill-opacity: 0.8;
+        }
     </style>
     <link rel="stylesheet" type="text/css" href="theme.css">
 
 </head>
 
 <body>
-    <h1>Tooltips</h1>
+    <h1>Lignes de temps</h1>
 
     <svg width=680 height=480>
         <g transform="translate(30,60)"></g>
@@ -127,6 +135,18 @@
     d3.select('svg>g').call(tip);
 
 
+    function create_line(d) {
+        var l = line(d);
+        d3.select('svg>g')
+            .append('path')
+            .attr({
+                class: 'timeline'
+            })
+            .attr({
+                d: l(d3.range(1960, 2016)),
+                stroke: categorie(d.nom),
+            });
+    }
 
     function create_data(population, richesse, sante) {
         var index = d3.map();
@@ -180,6 +200,17 @@
     var y = d3.scale.linear()
         .range([400, 0]);
     var categorie = d3.scale.category10();
+    var line = function (d) {
+        return d3.svg.line()
+            .x(function (t) {
+                return x(valeur(d.richesse, t));
+            })
+            .y(function (t) {
+                return y(valeur(d.sante, t));
+            })
+            .interpolate("basis");
+    }
+
 
 
     function update() {
@@ -198,9 +229,7 @@
                 cy: function (d) {
                     return y(valeur(d.sante, t));
                 },
-                r: function (d) {
-                    return rayon(valeur(d.population, t)) || 1;
-                },
+                r: 2.5,
                 fill: function (d) {
                     return categorie(d.nom);
                 },
@@ -238,8 +267,12 @@
                 .data(data)
                 .enter()
                 .append('circle')
-                .on('mouseover', tip.show)
+                .on('mouseover', function (d) {
+                    tip.show(d);
+                })
                 .on('mouseout', tip.hide);
+
+            pays.each(create_line);
 
             update();
 

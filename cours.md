@@ -699,3 +699,55 @@ Le code qui le déclenche est ajouté aux bulles après leur création (dans la 
         .on('mouseover', tip.show)
         .on('mouseout', tip.hide);
 ```
+
+
+# Ajout d'une ligne de temps
+
+On crée une ligne vide, et une fonction qui lui donne sa forme entre les dates 1960 et 2015 ([`page17.html`](page17.html)). 
+```
+    d3.select('svg>g')
+        .append('path')
+        .attr({
+            class: 'timeline'
+        });
+
+    function create_line(d) {
+        var l = line(d);
+        d3.selectAll('path.timeline')
+            .transition()
+            .attr({
+                d: l(d3.range(1960-1, 2015+1))
+            });
+    }
+    
+    var line = function (d) {
+        return d3.svg.line()
+            .x(function (t) {
+                return x(valeur(d.richesse, t));
+            })
+            .y(function (t) {
+                return y(valeur(d.sante, t));
+            })
+            .interpolate("basis");
+    }
+
+```
+
+et au survol d'un pays, on appelle cette fonction :
+```
+    .on('mouseover', function (d) {
+        tip.show(d);
+        create_line(d);
+     })
+```
+
+# Toutes les lignes de temps
+Une variante consiste à afficher plusieurs lignes de temps, mais si on en met trop ça devient illisible ([`page18.html`](page18.html)).
+
+```
+pays.each(create_line);
+```
+
+Par contre si on colore les lignes de temps avec la couleur du pays, et si on ajuste le rayon des bulles (`   r: 2.5`), on obtient une visualisation assez intéressante.
+
+On dispose maintenant d'une base pour tester toutes sortes de designs graphiques et pour interroger nos données.
