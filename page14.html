@@ -64,20 +64,14 @@
     // idéalement valeur(donnees, annee) = donnes[annee]
     // mais il manque des années, il faut donc interpoler
     function valeur(d, t) {
-        var c = +d[t];
-        if (!c) {
-            var t2 = t;
-            do {
-                c = +d[--t2];
-            } while (t2 > 1950 && !c);
-        }
-
-        if (!c) {
-            do {
-                c = +d[++t2];
-            } while (t2 < 2016 && !c);
-        }
-        return c;
+       var c, c1, c2;
+       for (var i in d) {
+           c = nombre(d[i]);
+           if (c && i == t) return c;
+           if (c && i < t) c1 = c;
+           if (c && i > t && !c2) c2 = c;
+       }
+       return c1 && c2 ? (c1+c2)/2 : c1 ? c1 : c2;
     }
 
     function create_data(population, richesse, sante) {

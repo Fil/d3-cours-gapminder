@@ -43,7 +43,7 @@ Ce site est connecté à tout l'écosystème de `d3.js`.
 
 Voir ensuite comment créer un compte Github, un gist, et faire le lien entre bl.ocks.org, gists et blockbuilder.
 
-Le bookmarklet s'avère très pratique !
+Le bookmarklet s'avèrera très pratique !
 
 
 # 4. Charger les données dans une page web
