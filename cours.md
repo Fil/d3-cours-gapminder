@@ -581,10 +581,19 @@ Référence: [SVG-Axes](https://github.com/d3/d3/wiki/SVG-Axes)
 Prévoir le style de nos axes :
 ```
 <style>
-    .axis path {
-        stroke: black;
-        fill: none;
-    }
+        .axis path {
+            stroke: black;
+            fill: none;
+        }
+        .tick line {
+            stroke: #444;
+        }
+        .tick text {
+            font-size: x-small;
+        }
+        text {
+            font-size: smaller;
+        }
 </style>
 ```
 

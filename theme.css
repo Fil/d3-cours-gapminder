@@ -3,9 +3,10 @@ html {
 }
 
 body {
-  margin: 2em;
+  font-family: "Lucida Bright", "Helvetica Neue", Helvetica, sans-serif;
+  margin: 4em 2em;
   padding: 1em;
-  max-width: 60em;
+  width: 50em;
   background: white;
 }
 
@@ -19,8 +20,9 @@ header {
   left: 0;
   height: 3em;
   width: 100%;
-  background-color: black;
-  color: white;
+  background-color: white;
+  border-bottom: 1px solid #444;
+  color: #444;
   padding-left: 2em;
 }
 
