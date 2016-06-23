@@ -1,36 +1,36 @@
 {{TOC}}
 
-# Vidéo
+# 1. Vidéo
 
 Hans Rosling's 200 Countries, 200 Years, 4 Minutes - The Joy of Stats (BBC Four)
 
 <iframe width="560" height="315" src="https://www.youtube.com/embed/jbkSRLYSojo" frameborder="0" allowfullscreen></iframe>
 
-# Données
+## Données
 Les données de cette vidéo sont disponibles sur le site de Gapminder.
 Source: https://www.gapminder.org/data/
 
 En fouillant un peu on trouve les documents suivants, que l’on peut télécharger au format CSV.
 
-## GDP per capita
+### GDP per capita
 https://docs.google.com/spreadsheets/d/1RctTQmKB0hzbm1E8rGcufYdMshRdhmYdeL29nXqmvsc/pub?gid=0
 http://spreadsheets.google.com/pub?key=1RctTQmKB0hzbm1E8rGcufYdMshRdhmYdeL29nXqmvsc&output=csv
 
-## Total population
+### Total population
 https://docs.google.com/spreadsheets/d/1IbDM8z5XicMIXgr93FPwjgwoTTKMuyLfzU6cQrGZzH8/pub?gid=0
 http://spreadsheets.google.com/pub?key=1IbDM8z5XicMIXgr93FPwjgwoTTKMuyLfzU6cQrGZzH8&output=csv
 
-## Life expectancy at birth
+### Life expectancy at birth
 https://docs.google.com/spreadsheets/d/1H3nzTwbn8z4lJ5gJ_WfDgCeGEXK3PVGcNjQ_U5og8eo/pub?gid=0
 http://spreadsheets.google.com/pub?key=1H3nzTwbn8z4lJ5gJ_WfDgCeGEXK3PVGcNjQ_U5og8eo&output=csv
 
 On observe la structure de ces fichiers : quelle est la « clé primaire » ? Comment sont renseignées les données ?
 
-# Découverte de d3.js
+# 2. Découverte de d3.js
 
 Le site d3js.org montre une panoplie d'exemples. Observer, discuter. L'histoire de D3 est assez intéressante aussi pour nous journalistes et auteurs de logiciels libres.
 
-# Utiliser Github, gists, bl.ocks.org et blockbuilder.org
+# 3. Utiliser Github, gists, bl.ocks.org et blockbuilder.org
 
 Pour bien travailler sur le Web il faut en général un serveur, un éditeur de texte, etc. On souhaite aussi conserver une trace (un historique) de tout ce que l'on fait, pouvoir faire des modifications et voir les résultats rapidement.
 
@@ -46,7 +46,7 @@ Voir ensuite comment créer un compte Github, un gist, et faire le lien entre bl
 Le bookmarklet s'avère très pratique !
 
 
-# Charger les données dans une page web
+# 4. Charger les données dans une page web
 
 Pour charger des données dans une page web, il faut passer par le langage Javascript.
 
@@ -95,7 +95,7 @@ On observe les données telles qu’elles sont affichées dans la console.
 
 
 
-# Nettoyer et préparer les données
+# 5. Nettoyer et préparer les données
 
 Comme on a vu précédemment, les données nous arrivent sous forme de nombres entre guillemets. Il va falloir convertir ces valeurs en nombres.
 
@@ -168,7 +168,7 @@ Celle-ci utilise `d3.select` pour identifier le `body` de la page Web, lui rajou
 
 
 
-## Jointure de données (data-binding)
+# 6. Jointure de données (data-binding)
 
 Cette méthode de création de nos éléments visuels (ici, des paragraphes), est un peu fruste. En effet, si on modifie nos données (par exemple en changeant l'année de référence), les paragraphes ne vont pas se modifier…
 
@@ -222,7 +222,7 @@ La séquence qui suit applique une fonction de rappel à chacun des éléments. 
 Le point le plus important est celui-ci : les données sont désormais enregistrées en tant que telles dans les éléments visuels qui les représentent. Le lien créé est solide et permet toutes les manipulations. Et si l'on modifie les données, l'opération `data()` sait conserver ces liaisons.
 
 
-# Un exemple (simpliste) d'interaction avec les données
+# 7. Un exemple (simpliste) d'interaction avec les données
 
 Dans cet exemple ([`page4.html`](page4.html)), on modifie simplement la création des éléments `p` :
 
@@ -252,7 +252,7 @@ Si un click est réalisé, la callback est appelée, elle reçoit comme argument
 Avec l'inspecteur, observer les attributs de nos paragraphes, et retrouver l'endroit où sont enregistrées les données liées aux éléments `p`.
 
 
-# Visualisation graphique
+# 8. Visualisation graphique
 
 Après les paragraphes, on va représenter nos données avec des ronds. Pour cela il faut d'abord apprendre à utiliser SVG.
 
@@ -275,7 +275,7 @@ La [`page5.html`](page5.html) donne un exemple de contenu SVG.
 Observer le code et manipuler les attributs des différents éléments dans l'inspecteur pour voir comment ils affectent le graphique.
 
 
-# Visualisation graphique de nos données
+# 9. Visualisation graphique de nos données
 
 Pour faire un graphique avec nos données, il suffit dès lors de combiner les techniques de data-binding de `d3` avec le format SVG. Ce qui est fait [`page6.html`](page6.html)
 
@@ -306,7 +306,7 @@ Ici au lieu d'ajouter un `p`on ajoute un cercle, dont le rayon est proportionnel
 
 Sans aucun changement, le code qui rendait nos paragraphes clicables rend désormais nos ronds clicables : l'interaction avec SVG se programme exactement comme celle avec HTML.
 
-# Les échelles
+# 10. Les échelles
 
 Un bout du code précédent s'avère particulièrement sale :
 `return 0.005 * Math.sqrt(d.pop2015);`
@@ -377,7 +377,7 @@ Le code suivant vise à sélectionner les ronds dont le rayon serait au moins de
 ```
 
 
-# Sur ces principes, construisons notre graphique
+# 11. Sur ces principes, construisons notre graphique
 
 On voit que la construction du graphique se ramène à deux questions :
 
@@ -436,56 +436,48 @@ On voit que cette fonction nous permet un éventuel contrôle d'erreur (variable
 
 Il ne reste plus qu'à traiter ces données pour constituer notre série statistiques à la date `t`.
 
-Là apparaissent plusieurs difficultés: d'une part nos séries de données sont incomplètes (on n'a pas le PIB par habitant en 2015, mais seulement en 2011). D'autre part la liste des pays n'est pas forcément la même.
-Bref, le nettoyage des données risque de nous faire mal à la tête.
+Là apparaissent plusieurs difficultés: d'une part nos séries de données sont incomplètes (on n'a pas le PIB par habitant en 2015, mais seulement en 2011). D'autre part la liste des pays n'est pas forcément la même. Bref, le nettoyage des données risque de nous faire mal à la tête.
 
-On applique du code qui nettoie et qui met tout ce qu'il faut dans un grande liste `data` (difficultés signalées par `🌶`).
+On applique du code (ci-dessous) pour nettoyer ; ce code met tout ce qu'il faut dans un grande liste `data` (avec une difficulté particulière, signalée par `🌶`).
 
 ```
-var t = 2015;
+        var t = 2000;
 
-var index = d3.map(); // 🌶
+        var data = d3.map(); // 🌶
 
-var cle = 'Total population';
-var data = population
-    .map(function (d, i) {
-        var nom = d[cle];
-        index.set(nom, i);
-        var e = {
-            nom: nom,
-            pop: nombre(d[t]),
-        };
-        return e;
-    });
+        var cle = 'Total population';
+        population.forEach(function (d) {
+                var nom = d[cle];
+                var e = {
+                    nom: nom,
+                    population: d,
+                    pop: valeur(d, 2015)
+                };
+                data.set(nom, e);
+            });
 
-var cle = 'Income per person (fixed 2000 US$)';
-richesse.map(function (d) {
-    var nom = d[cle];
-    var i = index.get(nom); // 🌶
-    if (typeof i == 'number') { // 🌶
-        var richesse = +d[t];
-        if (!richesse) {
-            var t2 = t;
-            do { // 🌶
-                richesse = +d[--t2];
-                if (nom == 'China') console.log(t2, d[t2]);
-            } while (t2 > 1950 && !richesse);
-        }
-        data[i].richesse = richesse;
-    }
-});
+        var cle = 'Income per person (fixed 2000 US$)';
+        richesse.forEach(function (d) {
+            var nom = d[cle];
+            var e = data.get(nom);
+            if (e) {
+                e.richesse = d;
+                data.set(nom, e);
+            }
+        });
 
 … (même chose pour la dimension santé) …
 
 // eliminer les pays qui n'ont pas toutes les donnees
 // et ceux qui sont trop petits
-data = data.filter(function (d) {
+data = data.values() // 🌶
+    .filter(function (d) {
     return d.richesse > 0 && d.sante > 0 && d.population > 100000;
 });
 ```
 
 
-# Créer les échelles
+# 12. Créer les échelles
 
 Maintenant que nous avons notre liste de données à afficher, et avons extrait les dimensions, nous pouvons créer les échelles pour les transformer en variables visuelles ([`page10.html`](page10.html)).
 
@@ -571,7 +563,7 @@ On inverse la courbe des `y` car en SVG, l'axe des `y` est tourné vers le bas :
 ```
 
 
-## Ajout des axes, légendes…
+## 13. Ajout des axes, légendes…
 
 D3 offre un module pour créer les axes ([`page12.html`](page12.html)); cela évite un travail fastidieux, d'autant que ces fonctions utilisent directement les échelles `d3.scale.…` pour avoir les bons réglages !
 
@@ -623,7 +615,7 @@ et pour finir, ajouter et positionner le nom des axes:
     })
 ```
 
-### Paramétrer le graphe en fonction de l'année !
+### 14. Paramétrer le graphe
 
 Essayons maintenant de changer la valeur de la variable `t`: `var t = 1960;` et `var t = 2015;` nous donnent des graphes très différents.
 
@@ -652,14 +644,14 @@ function annee() {
 Avec un peu de CSS en plus, et une fonction qui relève le changement d'état et l'affiche, on a désormais une tirette qui affiche l'année !
 
 
-# Reformatage du code
+# 15. Reformatage du code
 Il s'agit maintenant de mettre à jour les données en fonction de l'année courante.
 
 Pour cela, il faut reprendre tout le code et isoler ce qui sert la première fois (création des bulles), de ce qui sert en permanence (mise en place des variables visuelles de chacun des bulles).
 
 Ce reformatage est une opération moins difficile qu'il n'y paraît, mais il faut bien prendre garde à ne changer que ce qui dot changer. Ici les axes vont rester fixes, les bulles doivent changer de place et de forme, mais conserver la même couleur ([`page14.html`](page14.html)).
 
-# Animation automatique
+# 16. Animation automatique
 
 En cliquant sur la date, on va déclencher une animation automatique de la barre des dates, qu'on suspendra dès que l'utilisateur recliquera sur la tirette ou sur la date ([`page15.html`](page15.html)).
 
@@ -679,7 +671,7 @@ data.sort(function(a,b) {
 });
 ```
 
-# Ajout de tooltips
+# 17. Ajout de tooltips
 
 On utilise le plugin `d3-tip` pour créer des bulles au survol ([`page16.html`](page16.html)).
 ```
@@ -701,7 +693,7 @@ Le code qui le déclenche est ajouté aux bulles après leur création (dans la 
 ```
 
 
-# Ajout d'une ligne de temps
+# 18. Ajout d'une ligne de temps
 
 On crée une ligne vide, et une fonction qui lui donne sa forme entre les dates 1960 et 2015 ([`page17.html`](page17.html)). 
 ```
@@ -741,7 +733,7 @@ et au survol d'un pays, on appelle cette fonction :
      })
 ```
 
-# Toutes les lignes de temps
+# 19. Toutes les lignes de temps
 Une variante consiste à afficher plusieurs lignes de temps, mais si on en met trop ça devient illisible ([`page18.html`](page18.html)).
 
 ```
@@ -751,3 +743,15 @@ pays.each(create_line);
 Par contre si on colore les lignes de temps avec la couleur du pays, et si on ajuste le rayon des bulles (`   r: 2.5`), on obtient une visualisation assez intéressante.
 
 On dispose maintenant d'une base pour tester toutes sortes de designs graphiques et pour interroger nos données.
+
+
+# 20. Conclusion
+
+Ce parcours dans le code d'un exemple `d3.js` ne fait que montrer une possibilité graphique parmi les très nombreuses offertes par cet outil de programmation.
+
+Le plus important est de comprendre qu'il existe des méthodes de représentation visuelle qui sont fondées scientifiquement, dont on sait qu'elles sont efficaces pour communiquer auprès du public, efficaces aussi pour manipuler les données de façon interactive à l'écran, avec un retour immédiat ; ces approches permettent aussi de trouver de nouvelles intuitions. Un observateur avisé doté des bons outils trouvera de nouvelles questions à se poser, de nouveaux sujets à creuser, de nouvelles représentations à formuler.
+
+La méthodologie et le code vont ensemble, main dans la main, et d3.js est codé de façon à permettre de respecter les bonnes méthodes. Qui plus est, il est assez versatile pour permettre de faire de belles visualisations, sur un plan esthétique.
+
+Par le truchement des formats CSV et SVG, une développeuse, une journaliste et une artiste / graphiste habituée à des outils de dessin vectoriel peut travailler ensemble de façon très fluide et constructive. C'est ce que je vous souhaite !
+

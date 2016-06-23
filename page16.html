@@ -129,42 +129,43 @@
 
 
     function create_data(population, richesse, sante) {
-        var index = d3.map();
+        var data = d3.map(); // 🌶
 
         var cle = 'Total population';
-        var data = population
-            .map(function (d, i) {
+        population.forEach(function (d) {
                 var nom = d[cle];
-                index.set(nom, i);
                 var e = {
                     nom: nom,
                     population: d,
                     pop: valeur(d, 2015)
                 };
-                return e;
+                data.set(nom, e);
             });
 
         var cle = 'Income per person (fixed 2000 US$)';
-        richesse.map(function (d) {
+        richesse.forEach(function (d) {
             var nom = d[cle];
-            var i = index.get(nom); // 🌶
-            if (typeof i == 'number') { // 🌶
-                data[i].richesse = d;
+            var e = data.get(nom);
+            if (e) {
+                e.richesse = d;
+                data.set(nom, e);
             }
         });
 
         var cle = 'Life expectancy with projections. Yellow is IHME';
         sante.map(function (d) {
             var nom = d[cle];
-            var i = index.get(nom);
-            if (typeof i == 'number') {
-                data[i].sante = d;
+            var e = data.get(nom);
+            if (e) {
+                e.sante = d;
+                data.set(nom, e);
             }
         });
 
         // eliminer les pays qui n'ont pas de donnees
         // et ceux qui sont trop petits
-        data = data.filter(function (d) {
+        data = data.values()  // 🌶
+            .filter(function (d) {
             return d.richesse && d.sante && valeur(d.richesse, 1950) > 0 && valeur(d.sante, 1950) > 0 && d.pop > 100000;
         });
 

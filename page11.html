@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <title>Page 11</title>
-<link rel="stylesheet" type="text/css" href="theme.css">
+    <link rel="stylesheet" type="text/css" href="theme.css">
 
 </head>
 
@@ -32,61 +32,47 @@
         .await(function (error, population, richesse, sante) {
             if (error) throw error;
 
-            var t = 2015;
+            var t = 2000;
 
-            var index = d3.map(); // 🌶
-
+            var data = d3.map(); // 🌶
 
             var cle = 'Total population';
-            var data = population
-                .map(function (d, i) {
-                    var nom = d[cle];
-                    index.set(nom, i);
-                    var e = {
-                        nom: nom,
-                        pop: nombre(d[t]),
-                    };
-                    return e;
-                });
+            population.forEach(function (d) {
+                var nom = d[cle];
+                var e = {
+                    nom: nom,
+                    population: d,
+                    pop: +d[t]
+                };
+                data.set(nom, e);
+            });
 
             var cle = 'Income per person (fixed 2000 US$)';
-            richesse.map(function (d) {
+            richesse.forEach(function (d) {
                 var nom = d[cle];
-                var i = index.get(nom); // 🌶
-                if (typeof i == 'number') { // 🌶
-                    var richesse = +d[t];
-                    if (!richesse) {
-                        var t2 = t;
-                        do { // 🌶
-                            richesse = +d[--t2];
-                        } while (t2 > 1950 && !richesse);
-                    }
-                    data[i].richesse = richesse;
+                var e = data.get(nom);
+                if (e) {
+                    e.richesse = +d[t];
+                    data.set(nom, e);
                 }
             });
 
             var cle = 'Life expectancy with projections. Yellow is IHME';
             sante.map(function (d) {
                 var nom = d[cle];
-                var i = index.get(nom);
-                if (typeof i == 'number') {
-                    var sante = +d[t];
-                    if (!sante) {
-                        var t2 = t;
-                        do {
-                            sante = +d[--t2];
-                        } while (t2 > 1950 && !sante);
-                    }
-                    data[i].sante = sante;
+                var e = data.get(nom);
+                if (e) {
+                    e.sante = +d[t];
+                    data.set(nom, e);
                 }
             });
 
-            // eliminer les pays qui n'ont pas toutes les donnees
+            // eliminer les pays qui n'ont pas de donnees
             // et ceux qui sont trop petits
-            data = data.filter(function (d) {
-                return d.richesse > 0 && d.sante > 0 && d.pop > 100000;
-            });
-
+            data = data.values() // 🌶
+                .filter(function (d) {
+                    return d.richesse && d.sante && d.richesse > 0 && d.sante > 0 && d.pop > 100000;
+                });
 
             var rayon = d3.scale.sqrt()
                 .domain([0, d3.max(data, function (d) {
@@ -135,11 +121,12 @@
                     // d3.select(this).html( texte );
                 })
                 .append('title')
-                .text(function(d) {
+                .text(function (d) {
                     return d.nom;
                 });
         });
 </script>
 
 <script src="theme.js"></script>
+
 </html>
