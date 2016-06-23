@@ -679,3 +679,23 @@ data.sort(function(a,b) {
 });
 ```
 
+# Ajout de tooltips
+
+On utilise le plugin `d3-tip` pour créer des bulles au survol ([`page16.html`](page16.html)).
+```
+<script src="./d3.tip.v0.6.3.js"></script>
+var tip = d3.tip()
+    .attr('class', 'd3-tip')
+    .offset([-10, 0])
+    .html(function (d) {
+        return d.nom;
+    });
+d3.select('svg>g').call(tip);
+```
+
+Le code qui le déclenche est ajouté aux bulles après leur création (dans la partie `.enter`) :
+```
+    pays
+        .on('mouseover', tip.show)
+        .on('mouseout', tip.hide);
+```

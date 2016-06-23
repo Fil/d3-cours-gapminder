@@ -5,8 +5,6 @@ d3.select('body')
 
 var page = window.location.href.match(/page(\d+)\.html/), pages = '';
 
-console.log(page);
-
 if (page) {
     page = parseInt(page[1]);
 
