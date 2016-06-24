@@ -617,7 +617,7 @@ et pour finir, ajouter et positionner le nom des axes:
 
 ### 14. Paramétrer le graphe
 
-Essayons maintenant de changer la valeur de la variable `t`: `var t = 1960;` et `var t = 2015;` nous donnent des graphes très différents.
+Essayons maintenant de changer la valeur de la variable `t`: `var t = 1950;` et `var t = 2015;` nous donnent des graphes très différents.
 
 On va rendre cela paramétrable depuis la page ([`page13.html`](page13.html)).
 
@@ -650,6 +650,21 @@ Il s'agit maintenant de mettre à jour les données en fonction de l'année cour
 Pour cela, il faut reprendre tout le code et isoler ce qui sert la première fois (création des bulles), de ce qui sert en permanence (mise en place des variables visuelles de chacun des bulles).
 
 Ce reformatage est une opération moins difficile qu'il n'y paraît, mais il faut bien prendre garde à ne changer que ce qui dot changer. Ici les axes vont rester fixes, les bulles doivent changer de place et de forme, mais conserver la même couleur ([`page14.html`](page14.html)).
+
+Une difficulté particulière est que les années ne possèdent pas toutes des données associées. Il faut donc dans ces cas-là prendre des valeurs proches 🌶.
+
+```
+    function valeur(d, t) {
+       var c, c1, c2;
+       for (var i in d) {
+           c = nombre(d[i]);
+           if (c && i == t) return c;
+           if (c && i < t) c1 = c;
+           if (c && i > t && !c2) c2 = c;
+       }
+       return c1 && c2 ? (c1+c2)/2 : c1 ? c1 : c2;
+    }
+```
 
 # 16. Animation automatique
 
@@ -740,7 +755,7 @@ Une variante consiste à afficher plusieurs lignes de temps, mais si on en met t
 pays.each(create_line);
 ```
 
-Par contre si on colore les lignes de temps avec la couleur du pays, et si on ajuste le rayon des bulles (`   r: 2.5`), on obtient une visualisation assez intéressante.
+Par contre si on colore les lignes de temps avec la couleur du pays, et si on ajuste le rayon des bulles (`r: 2.5`), on obtient une visualisation assez intéressante.
 
 On dispose maintenant d'une base pour tester toutes sortes de designs graphiques et pour interroger nos données.
 
