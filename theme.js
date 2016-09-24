@@ -13,7 +13,7 @@ if (page) {
     else
         pages += '  | ';
 
-    if (page < 18)
+    if (page < 19)
        pages += '<a href=page'+(page+1)+'.html>&gt;</a>';
 
 }

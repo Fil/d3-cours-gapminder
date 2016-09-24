@@ -296,15 +296,13 @@ Ce morceau de notre page Web définit un SVG, avec un calque positionné en son 
         pays
             .enter()
             .append('circle')
-            .attr({
-                cx: 0,
-                cy: 0,
-                r: function (d) {
+            .attr('cx', 0)
+            .attr('cy', 0)
+            .attr('r', function (d) {
                     return 0.005 * Math.sqrt(d.pop2015);
-                },
-                fill: 'transparent',
-                stroke: 'red',
-            })
+                })
+            .attr('fill', 'transparent')
+            .attr('stroke', 'red');
 ```
 
 Ici au lieu d'ajouter un `p`on ajoute un cercle, dont le rayon est proportionnel à la racine carrée de la population en 2015. On le rend transparent avec une bordure rouge.
@@ -350,10 +348,9 @@ Ainsi par exemple on écrirait de préférence ([`page7.html`](page7.html)) :
 
 et puis, plus bas :
 ```
-           .attr({
-                r: function(d) {
+           .attr('r', function(d) {
                     return rayon(d.pop2015);
-                },
+                })
 ```
 
 Notre graphique est alors défini par des données, qui sont liées à des éléments du SVG (ou du HTML) ; des échelles permettent de définir, pour chaque élément, les variables visuelles qui lui correspondent.
@@ -365,13 +362,12 @@ Une échelle très pratique est `d3.scale.category10()`. On la découvre [`page8
 ```
        var categorie = d3.scale.category10();
 …/…
-       … .attr({
-                r: function (d) {
+       … .attr('r', function (d) {
                     return rayon(d.pop2015);
-                },
-                fill: function (d) {
+                })
+         .attr('fill', function (d) {
                     return categorie(d.nom);
-                },
+                })
 ```
 
 Le code suivant vise à sélectionner les ronds dont le rayon serait au moins de 5 pixels; on filtre donc les données _par rapport à une variable visuelle_:
@@ -525,20 +521,18 @@ var categorie = d3.scale.category10();
 
 On applique alors ces variables visuelles
 ```
-    .attr({
-        cx: function (d) {
+    .attr('cx', function (d) {
             return x(d.richesse);
-        },
-        cy: function (d) {
+        })
+    .attr('cy', function (d) {
             return y(d.sante);
-        },
-        r: function (d) {
+        })
+    .attr('r', function (d) {
             return rayon(d.pop);
-        },
-        fill: function (d) {
+        })
+    .attr('fill', function (d) {
             return categorie(d.nom);
-        },
-    })
+        })
 ```
 
 c'est un peu le bazar, mais on retrouve bien nos pays !
@@ -614,10 +608,8 @@ et pour finir, ajouter et positionner le nom des axes:
 ```
 .append('text')
     .text('PIB par habitant')
-    .attr({
-        transform: 'translate(640,-8)',
-        'text-anchor': 'end'
-    })
+    .attr('transform', 'translate(640,-8)')
+    .attr('text-anchor', 'end')
 ```
 
 ### 14. Paramétrer le graphe
@@ -719,17 +711,13 @@ On crée une ligne vide, et une fonction qui lui donne sa forme entre les dates 
 ```
     d3.select('svg>g')
         .append('path')
-        .attr({
-            class: 'timeline'
-        });
+        .attr('class', 'timeline');
 
     function create_line(d) {
         var l = line(d);
         d3.selectAll('path.timeline')
             .transition()
-            .attr({
-                d: l(d3.range(1960-1, 2015+1))
-            });
+            .attr('d', l(d3.range(1960-1, 2015+1)));
     }
     
     var line = function (d) {
@@ -760,7 +748,7 @@ Une variante consiste à afficher plusieurs lignes de temps, mais si on en met t
 pays.each(create_line);
 ```
 
-Par contre si on colore les lignes de temps avec la couleur du pays, et si on ajuste le rayon des bulles (`r: 2.5`), on obtient une visualisation assez intéressante.
+Par contre si on colore les lignes de temps avec la couleur du pays, et si on ajuste le rayon des bulles (`'r': 2.5`), on obtient une visualisation assez intéressante.
 
 On dispose maintenant d'une base pour tester toutes sortes de designs graphiques et pour interroger nos données.
 
