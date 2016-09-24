@@ -1,8 +1,3 @@
-# TODO
-- créer un fichier de données unique avec toutes les années même manquantes
-- positionner l'année en bonne vue
-- travailler sur les baisses fortes (les mettre en évidence, les relier à l'histoire : guerres, épidémie, famine…)
-
 {{TOC}}
 
 # 1. Vidéo
@@ -339,7 +334,7 @@ Le rayon de notre cercle (`r`) correspond à la variable visuelle TAILLE. Le bou
 Ainsi par exemple on écrirait de préférence ([`page7.html`](page7.html)) :
 
 ```
-        var rayon = d3.scale.sqrt()
+        var rayon =d3.scaleSqrt()
             .domain([ 0, d3.max(data2, function(d) {
                 return d.pop2015;
             }) ])
@@ -360,7 +355,7 @@ Plusieurs types d'échelles sont proposés de façon standard par `d3`; linéair
 Une échelle très pratique est `d3.scale.category10()`. On la découvre [`page8.html`](page8.html). Elle prend en domaine n'importe quelle valeur (ici, le nom du pays), et son étendue est une liste de 10 couleurs, qu'elle parcourt dans l'ordre.
 
 ```
-       var categorie = d3.scale.category10();
+       var categorie = d3.scaleOrdinal(d3.schemeCategory10);
 …/…
        … .attr('r', function (d) {
                     return rayon(d.pop2015);
@@ -424,7 +419,7 @@ Mais `d3` fournit [d3-queue](https://github.com/d3/d3-queue), un outil qui perme
 `<script src="./queue.v1.js"></script>`
 
 ```
-    queue()
+    d3.queue()
         .defer(d3.csv, 'population.csv')
         .defer(d3.csv, 'richesse.csv')
         .defer(d3.csv, 'sante.csv')
@@ -489,7 +484,7 @@ on utilisera ici simplement un `<title>` en SVG, avec sa syntaxe particulière.
 ### population
 => rayon, échelle en racine carrée
 ```
-var rayon = d3.scale.sqrt()
+var rayon =d3.scaleSqrt()
     .domain([0, d3.max(data, function (d) {
         return d.pop;
     })])
@@ -498,7 +493,7 @@ var rayon = d3.scale.sqrt()
 ### abscisse (x)
 => richesse du pays (PIB per capita), échelle logarithmique
 ```
-var x = d3.scale.log()
+var x = d3.scaleLog()
     .domain(d3.extent(data, function (d) {
         return d.richesse;
     }))
@@ -507,7 +502,7 @@ var x = d3.scale.log()
 ### ordonnée
 => espérance de vie (en années), échelle linéaire
 ```
-var y = d3.scale.linear()
+var y = d3.scaleLinear()
     .domain(d3.extent(data, function (d) {
         return d.sante;
     }))
@@ -516,7 +511,7 @@ var y = d3.scale.linear()
 
 ### couleur
 ```
-var categorie = d3.scale.category10();
+var categorie = d3.scaleOrdinal(d3.schemeCategory10);
 ```
 
 On applique alors ces variables visuelles
@@ -721,14 +716,14 @@ On crée une ligne vide, et une fonction qui lui donne sa forme entre les dates 
     }
     
     var line = function (d) {
-        return d3.svg.line()
+        return d3.line()
             .x(function (t) {
                 return x(valeur(d.richesse, t));
             })
             .y(function (t) {
                 return y(valeur(d.sante, t));
             })
-            .interpolate("basis");
+            .curve(d3.curveBasis);
     }
 
 ```
@@ -772,4 +767,6 @@ http://learnjsdata.com/
 https://www.gapminder.org/data/
 - pokeapi
 https://pokeapi.co/
-- passage complet à d3 v4 !
+- créer un fichier de données unique avec toutes les années même manquantes
+- positionner l'année en bonne vue
+- travailler sur les baisses fortes (les mettre en évidence, les relier à l'histoire : guerres, épidémie, famine…)

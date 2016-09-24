@@ -17,7 +17,7 @@
 
 </body>
 
-<script src="./d3.min.js"></script>
+<script src="./d3.v4.min.js"></script>
 <script>
     function nombre(x) {
         if (!x) return null;
@@ -34,7 +34,7 @@
                 return e;
             });
 
-        var rayon = d3.scale.sqrt()
+        var rayon =d3.scaleSqrt()
             .domain([0, d3.max(data2, function (d) {
                 return d.pop2015;
             })])
@@ -47,7 +47,7 @@
                 return rayon(d.pop2015) > 5;
             });
 
-        var categorie = d3.scale.category10();
+        var categorie = d3.scaleOrdinal(d3.schemeCategory10);
 
         var pays = d3.select('svg g')
             .selectAll('circle')

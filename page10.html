@@ -17,15 +17,15 @@
 
 </body>
 
-<script src="./d3.min.js"></script>
-<script src="./queue.v1.js"></script>
+<script src="./d3.v4.min.js"></script>
+<script>d3.functor = function(v) { return v; }</script>
 <script>
     function nombre(x) {
         if (!x) return null;
         return +(x.replace(/,/g, ''));
     }
 
-    queue()
+    d3.queue()
         .defer(d3.csv, 'population.csv')
         .defer(d3.csv, 'richesse.csv')
         .defer(d3.csv, 'sante.csv')
@@ -75,25 +75,25 @@
                 });
 
 
-            var rayon = d3.scale.sqrt()
+            var rayon =d3.scaleSqrt()
                 .domain([0, d3.max(data, function (d) {
                     return d.pop;
                 })])
                 .range([0, 200]);
 
-            var x = d3.scale.log()
+            var x = d3.scaleLog()
                 .domain(d3.extent(data, function (d) {
                     return d.richesse;
                 }))
                 .range([0, 640]);
 
-            var y = d3.scale.linear()
+            var y = d3.scaleLinear()
                 .domain(d3.extent(data, function (d) {
                     return d.sante;
                 }))
                 .range([0, 400]);
 
-            var categorie = d3.scale.category10();
+            var categorie = d3.scaleOrdinal(d3.schemeCategory10);
 
             var pays = d3.select('svg g')
                 .selectAll('circle')

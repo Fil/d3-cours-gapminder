@@ -17,7 +17,7 @@
 
 </body>
 
-<script src="./d3.min.js"></script>
+<script src="./d3.v4.min.js"></script>
 <script>
     function nombre(x) {
         if (!x) return null;
@@ -39,7 +39,7 @@
             })
             .slice(0, 10);
 
-        var rayon = d3.scale.sqrt()
+        var rayon =d3.scaleSqrt()
             .domain([ 0, d3.max(data2, function(d) {
                 return d.pop2015;
             }) ])
