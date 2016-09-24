@@ -96,8 +96,8 @@
 
 </body>
 
-<script src="./d3.min.js"></script>
-<script src="./queue.v1.js"></script>
+<script src="./d3.v4.min.js"></script>
+<script>d3.functor = function(v) { return v; }</script>
 <script src="./d3.tip.v0.6.3.js"></script>
 <script>
     function nombre(x) {
@@ -184,23 +184,23 @@
     }
 
     var pays = [];
-    var rayon = d3.scale.sqrt()
+    var rayon = d3.scaleSqrt()
         .range([0, 40]);
 
-    var x = d3.scale.log()
+    var x = d3.scaleLog()
         .range([0, 640]);
-    var y = d3.scale.linear()
+    var y = d3.scaleLinear()
         .range([400, 0]);
-    var categorie = d3.scale.category10();
+    var categorie = d3.scaleOrdinal(d3.schemeCategory10);
     var line = function (d) {
-        return d3.svg.line()
+        return d3.line()
             .x(function (t) {
                 return x(valeur(d.richesse, t));
             })
             .y(function (t) {
                 return y(valeur(d.sante, t));
             })
-            .interpolate("basis");
+            .curve(d3.curveBasis);
     }
 
 
@@ -213,7 +213,7 @@
             .transition()
             .delay(0)
             .duration(300)
-            .ease('linear')
+            .ease(d3.easeLinear)
             .attr('cx', function (d) {
                     return x(valeur(d.richesse, t));
                 })
@@ -229,7 +229,7 @@
 
     }
 
-    queue()
+    d3.queue()
         .defer(d3.csv, 'population.csv')
         .defer(d3.csv, 'richesse.csv')
         .defer(d3.csv, 'sante.csv')
@@ -273,14 +273,12 @@
             legendes = d3.select('svg>g')
                 .append('g');
 
-            var xAxis = d3.svg.axis()
+            var xAxis = d3.axisBottom()
                 .scale(x)
-                .orient("bottom")
                 .tickFormat(function (d, i) {
                     if (i % 3 == 0) return d;
                 }),
-                yAxis = d3.svg.axis()
-                .orient("left")
+                yAxis = d3.axisLeft()
                 .scale(y)
                 .ticks(8);
 
@@ -328,7 +326,7 @@
                 autoplay = setInterval(function () {
                     var a = annee() + 1;
                     if (a > 2015) a = 1950;
-                    d3.select("#annee input")[0][0].value = a;
+                    d3.select("#annee input")._groups[0][0].value = a;
                     affiche_annee();
                     update();
                 }, 300);
@@ -337,7 +335,7 @@
 
 
     function annee() {
-        return parseInt(d3.select("#annee input")[0][0].value);
+        return parseInt(d3.select("#annee input")._groups[0][0].value);
     }
 
     function affiche_annee() {

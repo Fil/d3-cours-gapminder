@@ -748,7 +748,7 @@ Une variante consiste à afficher plusieurs lignes de temps, mais si on en met t
 pays.each(create_line);
 ```
 
-Par contre si on colore les lignes de temps avec la couleur du pays, et si on ajuste le rayon des bulles (`'r': 2.5`), on obtient une visualisation assez intéressante.
+Par contre si on colore les lignes de temps avec la couleur du pays, et si on ajuste le rayon des bulles (`'r': 2.5`), on obtient une visualisation assez intéressante.  ([`page19.html`](page19.html)).
 
 On dispose maintenant d'une base pour tester toutes sortes de designs graphiques et pour interroger nos données.
 
@@ -772,4 +772,4 @@ http://learnjsdata.com/
 https://www.gapminder.org/data/
 - pokeapi
 https://pokeapi.co/
-- passage à d3 v4 !
+- passage complet à d3 v4 !
