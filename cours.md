@@ -682,7 +682,7 @@ data.sort(function(a,b) {
 
 On utilise le plugin `d3-tip` pour créer des bulles au survol ([`page16.html`](page16.html)).
 ```
-<script src="./d3.tip.v0.6.3.js"></script>
+<script src="./d3-tip.js"></script>
 var tip = d3.tip()
     .attr('class', 'd3-tip')
     .offset([-10, 0])
