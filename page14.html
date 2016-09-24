@@ -134,20 +134,18 @@
         var t = annee();
 
         pays
-            .attr({
-                cx: function (d) {
+            .attr('cx', function (d) {
                     return x(valeur(d.richesse, t));
-                },
-                cy: function (d) {
+                })
+            .attr('cy', function (d) {
                     return y(valeur(d.sante, t));
-                },
-                r: function (d) {
+                })
+            .attr('r', function (d) {
                     return rayon(valeur(d.population, t)) || 1;
-                },
-                fill: function (d) {
+                })
+            .attr('fill', function (d) {
                     return categorie(d.nom);
-                },
-            })
+                })
             .on('click', function (d) {
                 var texte = d.nom + ': ' + d.population;
                 alert(texte);
@@ -209,10 +207,8 @@
                 .call(xAxis)
                 .append('text')
                 .text('PIB par habitant')
-                .attr({
-                    transform: 'translate(640,-8)',
-                    'text-anchor': 'end'
-                });
+                .attr('transform', 'translate(640,-8)')
+                .attr('text-anchor', 'end');
 
             legendes.append("g")
                 .attr("class", "y axis")
@@ -220,10 +216,8 @@
                 .call(yAxis)
                 .append('text')
                 .text('Espérance de vie à la naissance')
-                .attr({
-                    transform: 'translate(5,8)',
-                    'text-anchor': 'start'
-                });
+                .attr('transform', 'translate(5,8)')
+                .attr('text-anchor', 'start');
 
 
 

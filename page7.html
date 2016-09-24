@@ -52,15 +52,13 @@
         pays
             .enter()
             .append('circle')
-            .attr({
-                cx: 0,
-                cy: 0,
-                r: function(d) {
+            .attr('cx', 0)
+            .attr('cy', 0)
+            .attr('r', function (d) {
                     return rayon(d.pop2015);
-                },
-                fill: 'transparent',
-                stroke: 'red',
-            })
+                })
+            .attr('fill', 'transparent')
+            .attr('stroke', 'red')
             .on('click', function (d) {
                 var texte = d.nom + ': ' + d.pop2015;
                 alert(texte);

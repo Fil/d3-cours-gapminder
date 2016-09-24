@@ -4,17 +4,19 @@ html {
 
 body {
   font-family: "Lucida Bright", "Helvetica Neue", Helvetica, sans-serif;
-  margin: 4em 2em;
-  padding: 1em;
+  margin: 1em 1em;
+  padding: 0em;
   width: 50em;
   background: white;
 }
 
 h1 {
+display: none;
   font-size: 1.3em;
 }
 
 header {
+display:none;
   position: fixed;
   top: 0;
   left: 0;

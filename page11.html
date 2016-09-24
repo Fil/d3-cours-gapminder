@@ -101,20 +101,18 @@
             pays
                 .enter()
                 .append('circle')
-                .attr({
-                    cx: function (d) {
+                .attr('cx', function (d) {
                         return x(d.richesse);
-                    },
-                    cy: function (d) {
+                    })
+                .attr('cy', function (d) {
                         return y(d.sante);
-                    },
-                    r: function (d) {
+                    })
+                .attr('r', function (d) {
                         return rayon(d.pop);
-                    },
-                    fill: function (d) {
+                    })
+                .attr('fill', function (d) {
                         return categorie(d.nom);
-                    },
-                })
+                    })
                 .on('click', function (d) {
                     var texte = d.nom + ': ' + d.pop;
                     alert(texte);

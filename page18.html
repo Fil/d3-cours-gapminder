@@ -133,13 +133,9 @@
         var l = line(d);
         d3.select('svg>g')
             .append('path')
-            .attr({
-                class: 'timeline'
-            })
-            .attr({
-                d: l(d3.range(1950, 2016)),
-                stroke: categorie(d.nom),
-            });
+            .attr('class', 'timeline')
+            .attr('d', l(d3.range(1950, 2016)))
+            .attr('stroke', categorie(d.nom));
     }
 
     function create_data(population, richesse, sante) {
@@ -218,18 +214,19 @@
             .delay(0)
             .duration(300)
             .ease('linear')
-            .attr({
-                cx: function (d) {
+            .attr('cx', function (d) {
                     return x(valeur(d.richesse, t));
-                },
-                cy: function (d) {
+                })
+            .attr('cy', function (d) {
                     return y(valeur(d.sante, t));
-                },
-                r: 2.5,
-                fill: function (d) {
+                })
+            .attr('r', function (d) {
+                    return rayon(valeur(d.population, t)) || 1;
+                })
+            .attr('fill', function (d) {
                     return categorie(d.nom);
-                },
-            });
+                });
+
     }
 
     queue()
@@ -290,11 +287,9 @@
             legendes.append("g")
                 .append('text')
                 .text('Richesse et santé des nations')
-                .attr({
-                    transform: 'translate(640,-16)',
-                    'text-anchor': 'end',
-                    class: 'titre',
-                });
+                .attr('transform', 'translate(640,-16)')
+                .attr('text-anchor', 'end')
+                .attr('class', 'titre');
 
             legendes.append("g")
                 .attr("class", "x axis")
@@ -302,10 +297,8 @@
                 .call(xAxis)
                 .append('text')
                 .text('PIB par habitant')
-                .attr({
-                    transform: 'translate(640,-8)',
-                    'text-anchor': 'end'
-                });
+                .attr('transform', 'translate(640,-8)')
+                .attr('text-anchor', 'end');
 
             legendes.append("g")
                 .attr("class", "y axis")
@@ -313,10 +306,8 @@
                 .call(yAxis)
                 .append('text')
                 .text('Espérance de vie à la naissance')
-                .attr({
-                    transform: 'translate(5,-16)',
-                    'text-anchor': 'start',
-                });
+                .attr('transform', 'translate(5,8)')
+                .attr('text-anchor', 'start');
 
         });
     d3.select('body')

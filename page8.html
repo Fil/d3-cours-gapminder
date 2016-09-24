@@ -56,16 +56,14 @@
         pays
             .enter()
             .append('circle')
-            .attr({
-                cx: 0,
-                cy: 0,
-                r: function (d) {
+            .attr('cx', 0)
+            .attr('cy', 0)
+            .attr('r', function (d) {
                     return rayon(d.pop2015);
-                },
-                fill: function (d) {
+                })
+            .attr('fill', function (d) {
                     return categorie(d.nom);
-                },
-            })
+                })
             .on('click', function (d) {
                 var texte = d.nom + ': ' + d.pop2015;
                 alert(texte);

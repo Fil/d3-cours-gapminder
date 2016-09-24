@@ -1,3 +1,8 @@
+# TODO
+- créer un fichier de données unique avec toutes les années même manquantes
+- positionner l'année en bonne vue
+- travailler sur les baisses fortes (les mettre en évidence, les relier à l'histoire : guerres, épidémie, famine…)
+
 {{TOC}}
 
 # 1. Vidéo
@@ -770,3 +775,13 @@ La méthodologie et le code vont ensemble, main dans la main, et d3.js est codé
 
 Par le truchement des formats CSV et SVG, une développeuse, une journaliste et une artiste / graphiste habituée à des outils de dessin vectoriel peut travailler ensemble de façon très fluide et constructive. C'est ce que je vous souhaite !
 
+
+## Pour aller plus loin
+
+- traitement de données avec D3
+http://learnjsdata.com/
+- Gapminder data
+https://www.gapminder.org/data/
+- pokeapi
+https://pokeapi.co/
+- passage à d3 v4 !
