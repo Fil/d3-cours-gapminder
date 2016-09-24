@@ -38,11 +38,11 @@
             .selectAll('p')
             .data(data2);
 
-        pays
+        var enter = pays
             .enter()
             .append('p');
 
-        pays
+        enter
             .html(function (d) {
                 return d.nom + ': ' + d.pop2015;
             });
