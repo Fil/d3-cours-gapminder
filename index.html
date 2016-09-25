@@ -1,5 +1,14 @@
-<p>{{TOC}}</p>
-<h1 id="vidéo">1. Vidéo</h1>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" type="text/css" href="theme.css">
+    <title>Introduction à d3.js</title>
+
+</head>
+
+
+<h2 id="vidéo">1. Vidéo</h2>
 <p>Hans Rosling's 200 Countries, 200 Years, 4 Minutes - The Joy of Stats (BBC Four)</p>
 <iframe width="560" height="315" src="https://www.youtube.com/embed/jbkSRLYSojo" frameborder="0" allowfullscreen>
 </iframe>
@@ -93,11 +102,11 @@ return 0; // cas de l&#39;égalité entre les deux valeurs</code></pre>
             .selectAll(&#39;p&#39;)
             .data(data2);
 
-        pays
+        var enter = pays
             .enter()
             .append(&#39;p&#39;);
 
-        pays
+        enter
             .html(function (d) {
                 return d.nom + &#39;: &#39; + d.pop2015;
             });</code></pre>
@@ -467,3 +476,6 @@ d3.select(&#39;svg&gt;g&#39;).call(tip);</code></pre>
 <li>positionner l'année en bonne vue</li>
 <li>travailler sur les baisses fortes (les mettre en évidence, les relier à l'histoire : guerres, épidémie, famine…)</li>
 </ul>
+
+<script src="theme.js"></script>
+</html>

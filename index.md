@@ -181,11 +181,11 @@ Cette méthode consiste à remplacer le code précédent par la construction un 
             .selectAll('p')
             .data(data2);
 
-        pays
+        var enter = pays
             .enter()
             .append('p');
 
-        pays
+        enter
             .html(function (d) {
                 return d.nom + ': ' + d.pop2015;
             });
@@ -214,7 +214,7 @@ La séquence ci-dessous crée les éléments en question.
 La séquence qui suit applique une fonction de rappel à chacun des éléments. La fonction de rappel reçoit la _donnée associée_ à l'élément, et le résultat est envoyé dans son code HTML.
 
 ```
-    pays.html(function (d) {
+    enter.html(function (d) {
         return d.nom + ': ' + d.pop2015;
     })
 ```
