@@ -19,23 +19,19 @@
 
 <script src="./d3.v4.min.js"></script>
 <script>
-    function nombre(x) {
-        if (!x) return null;
-        return +(x.replace(/,/g, ''));
-    }
 
-    d3.csv('population.csv', function (data) {
+    d3.csv('recent.csv', function (data) {
         data2 = data
             .map(function (d) {
                 var e = {
-                    nom: d['Total population'],
-                    pop2015: nombre(d[2015]),
+                    nom: d.key,
+                    population: +d.population,
                 };
                 return e;
             });
 
         data2 = data2.sort(function (a, b) {
-                return d3.descending(a.pop2015, b.pop2015);
+                return d3.descending(a.population, b.population);
             })
             .slice(0, 10);
 
@@ -49,12 +45,12 @@
             .attr('cx', 0)
             .attr('cy', 0)
             .attr('r', function (d) {
-                    return 0.005 * Math.sqrt(d.pop2015);
+                    return 0.005 * Math.sqrt(d.population);
                 })
             .attr('fill', 'transparent')
             .attr('stroke', 'red')
             .on('click', function (d) {
-                var texte = d.nom + ': ' + d.pop2015;
+                var texte = d.nom + ': ' + d.population;
                 alert(texte);
                 // d3.select(this).html( texte );
             });

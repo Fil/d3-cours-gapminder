@@ -14,23 +14,9 @@
 <script src="./d3.v4.min.js"></script>
 <script>
 
-function nombre(x) {
-    if (!x) return null;
-    return +(x.replace(/,/g, ''));
-}
-
-d3.csv('population.csv', function(data) {
-    data2 = data
-    .map(function(d) {
-        var e = {
-            nom: d['Total population'],
-            pop2015: nombre(d[2015]),
-        };
-        return e;
-    });
-
-    data2 = data2.sort(function(a,b) {
-        return d3.descending(a.pop2015, b.pop2015);
+d3.csv('recent.csv', function(data) {
+    var data2 = data.sort(function(a,b) {
+        return d3.descending(+a.population, +b.population);
     })
     .slice(0,10);
 
@@ -39,7 +25,7 @@ d3.csv('population.csv', function(data) {
     data2.forEach(function(d) {
         d3.select('body')
           .append('p')
-          .html(d.nom+': '+d.pop2015);
+          .html(d.key + ': ' + d.population);
     })
     ;
 

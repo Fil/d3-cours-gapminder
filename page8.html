@@ -19,32 +19,28 @@
 
 <script src="./d3.v4.min.js"></script>
 <script>
-    function nombre(x) {
-        if (!x) return null;
-        return +(x.replace(/,/g, ''));
-    }
 
-    d3.csv('population.csv', function (data) {
+    d3.csv('recent.csv', function (data) {
         data2 = data
             .map(function (d) {
                 var e = {
-                    nom: d['Total population'],
-                    pop2015: nombre(d[2015]),
+                    nom: d.key,
+                    population: +d.population,
                 };
                 return e;
             });
 
         var rayon =d3.scaleSqrt()
             .domain([0, d3.max(data2, function (d) {
-                return d.pop2015;
+                return d.population;
             })])
             .range([0, 200]);
 
         data2 = data2.sort(function (a, b) {
-                return d3.descending(a.pop2015, b.pop2015);
+                return d3.descending(a.population, b.population);
             })
             .filter(function (d) {
-                return rayon(d.pop2015) > 5;
+                return rayon(d.population) > 5;
             });
 
         var categorie = d3.scaleOrdinal(d3.schemeCategory10);
@@ -59,13 +55,13 @@
             .attr('cx', 0)
             .attr('cy', 0)
             .attr('r', function (d) {
-                    return rayon(d.pop2015);
+                    return rayon(d.population);
                 })
             .attr('fill', function (d) {
                     return categorie(d.nom);
                 })
             .on('click', function (d) {
-                var texte = d.nom + ': ' + d.pop2015;
+                var texte = d.nom + ': ' + d.population;
                 alert(texte);
                 // d3.select(this).html( texte );
             });
