@@ -20,6 +20,12 @@
 <script src="./d3.v4.min.js"></script>
 <script>
 	d3.csv('recent.csv', function (error, data) {
+		data = data.map(d => ({
+			nom: d.key,
+			population: +d.population,
+			gdp: +d.gdp,
+			life: +d.life,
+		}));
             var rayon =d3.scaleSqrt()
                 .domain([0, d3.max(data, function (d) {
                     return d.population;
