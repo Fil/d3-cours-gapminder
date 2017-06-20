@@ -4,91 +4,72 @@
 <head>
     <meta charset="utf-8" />
     <title>Page 11</title>
+
+    <style>
+        .axis {
+            shape-rendering: crispEdges;
+        }
+        
+        .axis path {
+            stroke: black;
+            fill: none;
+        }
+        
+        .tick:nth-of-type(3n+1) line {
+            stroke: #444;
+        }
+        
+        .tick text {
+            font-size: x-small;
+        }
+        
+        text {
+            font-size: smaller;
+            fill: black;
+        }
+        
+        text.titre {
+            font-weight: bold;
+            font-size: larger;
+        }
+    </style>
     <link rel="stylesheet" type="text/css" href="theme.css">
 
 </head>
 
 <body>
-    <h1>Petits ajustements</h1>
-
-    <svg width=680 height=420>
+    <h1>Ajout des axes</h1>
+    <svg width=680 height=450>
         <g transform="translate(30,30)"></g>
     </svg>
 
 </body>
 
 <script src="./d3.v4.min.js"></script>
-<script>d3.functor = function(v) { return v; }</script>
 <script>
-    function nombre(x) {
-        if (!x) return null;
-        return +(x.replace(/,/g, ''));
-    }
-
-    d3.queue()
-        .defer(d3.csv, 'population.csv')
-        .defer(d3.csv, 'richesse.csv')
-        .defer(d3.csv, 'sante.csv')
-        .await(function (error, population, richesse, sante) {
-            if (error) throw error;
-
-            var t = 2000;
-
-            var data = d3.map(); // 🌶
-
-            var cle = 'Total population';
-            population.forEach(function (d) {
-                var nom = d[cle];
-                var e = {
-                    nom: nom,
-                    population: d,
-                    pop: +d[t]
-                };
-                data.set(nom, e);
-            });
-
-            var cle = 'Income per person (fixed 2000 US$)';
-            richesse.forEach(function (d) {
-                var nom = d[cle];
-                var e = data.get(nom);
-                if (e) {
-                    e.richesse = +d[t];
-                    data.set(nom, e);
-                }
-            });
-
-            var cle = 'Life expectancy with projections. Yellow is IHME';
-            sante.map(function (d) {
-                var nom = d[cle];
-                var e = data.get(nom);
-                if (e) {
-                    e.sante = +d[t];
-                    data.set(nom, e);
-                }
-            });
-
-            // eliminer les pays qui n'ont pas de donnees
-            // et ceux qui sont trop petits
-            data = data.values() // 🌶
-                .filter(function (d) {
-                    return d.richesse && d.sante && d.richesse > 0 && d.sante > 0 && d.pop > 100000;
-                });
-
-            var rayon =d3.scaleSqrt()
+	d3.csv('recent.csv', function (error, data) {
+		data = data.map(d => ({
+			nom: d.key,
+			population: +d.population,
+			gdp: +d.gdp,
+			life: +d.life,
+			continent: d.continent,
+		}));
+            var rayon = d3.scaleSqrt()
                 .domain([0, d3.max(data, function (d) {
-                    return d.pop;
+                    return d.population;
                 })])
                 .range([0, 40]);
 
             var x = d3.scaleLog()
                 .domain(d3.extent(data, function (d) {
-                    return d.richesse;
+                    return d.gdp;
                 }))
                 .range([0, 640]);
 
             var y = d3.scaleLinear()
                 .domain(d3.extent(data, function (d) {
-                    return d.sante;
+                    return d.life;
                 }))
                 .range([400, 0]);
 
@@ -102,26 +83,57 @@
                 .enter()
                 .append('circle')
                 .attr('cx', function (d) {
-                        return x(d.richesse);
+                        return x(d.gdp);
                     })
-                .attr('cy', function (d) {
-                        return y(d.sante);
+                .attr('cy',function (d) {
+                        return y(d.life);
                     })
                 .attr('r', function (d) {
-                        return rayon(d.pop);
+                        return rayon(d.population);
                     })
                 .attr('fill', function (d) {
-                        return categorie(d.nom);
+                        return categorie(d.continent);
                     })
                 .on('click', function (d) {
-                    var texte = d.nom + ': ' + d.pop;
+                    var texte = d.nom + ': ' + d.population;
                     alert(texte);
                     // d3.select(this).html( texte );
                 })
                 .append('title')
-                .text(function (d) {
+                .text(function(d) {
                     return d.nom;
                 });
+
+            // Axes
+            legendes = d3.select('svg>g')
+                .append('g');
+            var xAxis = d3.axisBottom()
+                .scale(x)
+                .tickFormat(function (d, i) {
+                    if (i % 3 == 0) return d;
+                }),
+                yAxis = d3.axisLeft()
+                .scale(y)
+                .ticks(8);
+
+            legendes.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + 400 + ")")
+                .call(xAxis)
+                .append('text')
+                .text('PIB par habitant')
+                .attr('transform', 'translate(640,-8)')
+                .attr('text-anchor', 'end');
+
+            legendes.append("g")
+                .attr("class", "y axis")
+                .attr("transform", "translate(0,0)")
+                .call(yAxis)
+                .append('text')
+                .text('Espérance de vie à la naissance')
+                .attr('transform', 'translate(5,8)')
+                .attr('text-anchor', 'start');
+
         });
 </script>
 
