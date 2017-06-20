@@ -25,6 +25,7 @@
         
         text {
             font-size: smaller;
+            fill: black;
         }
         
         text.titre {
@@ -48,7 +49,7 @@
             stroke: white;
             stroke-width: 0.6;
         }
-        
+
         .d3-tip {
             padding: 5px;
             background: rgba(200, 200, 200, 0.8);
@@ -74,12 +75,15 @@
             top: 100%;
             left: 0;
         }
-        
+
         path.timeline {
             fill: none;
-            stroke: #333;
-            stroke-width: 1.2;
+            stroke-width: 0.3;
         }
+        circle {
+            fill-opacity: 0.8;
+        }
+
     </style>
     <link rel="stylesheet" type="text/css" href="theme.css">
 
@@ -97,178 +101,73 @@
 <script src="./d3.v4.min.js"></script>
 <script src="./d3-tip.js"></script>
 <script>
-    function nombre(x) {
-        if (!x) return null;
-        return +(x.replace(/,/g, ''));
-    }
-
-    // 🌶
-    // idéalement valeur(donnees, annee) = donnes[annee]
-    // mais il manque des années, il faut donc interpoler
-    function valeur(d, t) {
-       var c, c1, c2;
-       for (var i in d) {
-           c = nombre(d[i]);
-           if (c && i == t) return c;
-           if (c && i < t) c1 = c;
-           if (c && i > t && !c2) c2 = c;
-       }
-       return c1 && c2 ? (c1+c2)/2 : c1 ? c1 : c2;
-    }
-
     var tip = d3.tip()
         .attr('class', 'd3-tip')
         .offset([-10, 0])
         .html(function (d) {
-            return d.nom;
+            return d.key;
         });
 
     d3.select('svg>g').call(tip);
 
 
-    d3.select('svg>g')
-        .append('path')
-        .attr('class', 'timeline');
-
-    function create_line(d) {
-        var l = line(d);
-        d3.selectAll('path.timeline')
-            .transition()
-            .attr('d', l(d3.range(1960, 2016)));
-    }
-
-    function create_data(population, richesse, sante) {
-        var data = d3.map(); // 🌶
-
-        var cle = 'Total population';
-        population.forEach(function (d) {
-                var nom = d[cle];
-                var e = {
-                    nom: nom,
-                    population: d,
-                    pop: valeur(d, 2015)
-                };
-                data.set(nom, e);
-            });
-
-        var cle = 'Income per person (fixed 2000 US$)';
-        richesse.forEach(function (d) {
-            var nom = d[cle];
-            var e = data.get(nom);
-            if (e) {
-                e.richesse = d;
-                data.set(nom, e);
-            }
-        });
-
-        var cle = 'Life expectancy with projections. Yellow is IHME';
-        sante.map(function (d) {
-            var nom = d[cle];
-            var e = data.get(nom);
-            if (e) {
-                e.sante = d;
-                data.set(nom, e);
-            }
-        });
-
-        // eliminer les pays qui n'ont pas de donnees
-        // et ceux qui sont trop petits
-        data = data.values()  // 🌶
-            .filter(function (d) {
-            return d.richesse && d.sante && valeur(d.richesse, 1950) > 0 && valeur(d.sante, 1950) > 0 && d.pop > 100000;
-        });
-
-        return data;
-    }
-
-    var pays = [];
-    var rayon = d3.scaleSqrt()
-        .range([0, 40]);
-
-    var x = d3.scaleLog()
-        .range([0, 640]);
-    var y = d3.scaleLinear()
-        .range([400, 0]);
-    var categorie = d3.scaleOrdinal(d3.schemeCategory10);
     var line = function (d) {
         return d3.line()
             .x(function (t) {
-                return x(valeur(d.richesse, t));
+                return x(d.values[t - 1800].gdp || 1);
             })
             .y(function (t) {
-                return y(valeur(d.sante, t));
+                return y(d.values[t - 1800].life || 1);
             })
             .curve(d3.curveBasis);
     }
 
 
+	var pays;
 
-    function update() {
+	var x = d3.scaleLog()
+                .range([0, 640]);
 
-        var t = annee();
+    var y = d3.scaleLinear()
+                .range([400, 0]);
 
-        pays
-            .transition()
-            .delay(0)
-            .duration(300)
-            .ease(d3.easeLinear)
-            .attr('cx', function (d) {
-                    return x(valeur(d.richesse, t));
-                })
-            .attr('cy', function (d) {
-                    return y(valeur(d.sante, t));
-                })
-            .attr('r', function (d) {
-                    return rayon(valeur(d.population, t)) || 1;
-                })
-            .attr('fill', function (d) {
-                    return categorie(d.nom);
-                });
-    }
+    var r = d3.scaleSqrt()
+                .range([1, 40]);
 
-    d3.queue()
-        .defer(d3.csv, 'population.csv')
-        .defer(d3.csv, 'richesse.csv')
-        .defer(d3.csv, 'sante.csv')
-        .await(function (error, population, richesse, sante) {
-            if (error) throw error;
+            var categorie = d3.scaleOrdinal(d3.schemeCategory10);
 
-            var data = create_data(population, richesse, sante);
+	d3.json('by_year.json', function (error, data) {
 
-            data.sort(function (a, b) {
-                return d3.descending(a.pop, b.pop);
-            });
+            x.domain([100, d3.max(data, d => d3.max(d.values.map(e => e.gdp)))]);
+            y.domain([10, d3.max(data, d => d3.max(d.values.map(e => e.life)))]);
+            r.domain([0, d3.max(data, d => d3.max(d.values.map(e => e.population)))]);
 
-            rayon
-                .domain([0, d3.max(data, function (d) {
-                    return d3.max(d3.values(d.population).map(nombre));
-                })])
 
-            x.domain([100, d3.max(data, function (d) {
-                return d3.max(d3.values(d.richesse).map(nombre));
-            })]);
-            y.domain([35, d3.max(data, function (d) {
-                return d3.max(d3.values(d.sante).map(nombre));
-            })]);
-
+			d3.select('svg>g')
+                .selectAll('path')
+                .data(data)
+                .enter()
+        	.append('path')
+        	.attr('class', 'timeline')
+        	.attr('stroke', d => categorie(d.continent))
+            .attr('d', d => (line(d))(d3.range(1800, 2016)));
 
             pays = d3.select('svg g')
                 .selectAll('circle')
                 .data(data)
                 .enter()
                 .append('circle')
-                .on('mouseover', function (d) {
-                    tip.show(d);
-                    create_line(d);
-                })
+                .attr('fill', d => categorie(d.continent))
+                .on('mouseover', tip.show)
                 .on('mouseout', tip.hide);
+
+
 
             update();
 
             // Axes
             legendes = d3.select('svg>g')
                 .append('g');
-
             var xAxis = d3.axisBottom()
                 .scale(x)
                 .tickFormat(function (d, i) {
@@ -303,11 +202,12 @@
                 .attr('transform', 'translate(5,8)')
                 .attr('text-anchor', 'start');
 
+
         });
     d3.select('body')
         .append('div')
         .attr('id', 'annee')
-        .html('<input type=range value=2015 min=1950 max=2015 step=1><div></div>');
+        .html('<input type=range value=2015 min=1800 max=2015 step=1><div></div>');
 
 
     var autoplay = false;
@@ -321,8 +221,8 @@
             } else {
                 autoplay = setInterval(function () {
                     var a = annee() + 1;
-                    if (a > 2015) a = 1950;
-                    d3.select("#annee input")._groups[0][0].value = a;
+                    if (a > 2015) a = 1800;
+                    d3.select("#annee input").node().value = a;
                     affiche_annee();
                     update();
                 }, 300);
@@ -331,8 +231,21 @@
 
 
     function annee() {
-        return parseInt(d3.select("#annee input")._groups[0][0].value);
+        return parseInt(d3.select("#annee input").node().value);
     }
+
+			function update() {
+				var year = annee();
+				pays
+            .transition()
+            .delay(0)
+            .duration(300)
+            .ease(d3.easeLinear)
+				  .attr('cx', d => x(d.values[year - 1800].gdp || 1))
+				  .attr('cy', d => y(d.values[year - 1800].life))
+				  .attr('r', d => r(d.values[year - 1800].population));
+			}
+
 
     function affiche_annee() {
         d3.select("#annee div").html(annee() + " " + (autoplay ? "| |" : "|&gt;"));
@@ -350,5 +263,4 @@
 </script>
 
 <script src="theme.js"></script>
-
 </html>
