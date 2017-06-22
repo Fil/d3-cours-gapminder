@@ -32,7 +32,7 @@ Source: <a href='https://www.gapminder.org/data/' target='_blank' >https://www.g
 <p>Commençons tout de suite par une structure de page Web classique, contenant deux scripts (<a href='page1.html'><code>page1.html</code></a>). L’un est d3.js, l’autre un script personnalisable, dans lequel on va pouvoir développer.</p>
 <p>Dans ce script, commençons tout de suite par charger nos données :</p>
 <pre><code>
-d3.csv(&#39;recent.csv&#39;, function(data) {
+d3.csv(&#39;recent.csv&#39;, data =&gt; {
     console.log(data);
 });
 </code></pre>
@@ -85,27 +85,21 @@ Exemple de traitement de son avec Audio API : <a href='http://bl.ocks.org/eesur/
 <p>Dans la fonction de rappel de <code>d3.csv</code>, on va traiter la liste de données <code>data</code> avec la méthode <code>.map()</code>. Cette méthode emploie une autre fonction de rappel, à laquelle elle passe un par un les objets de notre liste. Et elle compose une autre liste avec les valeurs renvoyées par cette fonction.</p>
 <pre><code>
     data
-    .map(function(d) {
-        var e = {
+    .map(d =&gt; ({
             nom: d.key,
             population: +d.population,
-        };
-        return e;
-    });
+        }));
 </code></pre>
 <p>Maintenant que les données sont chargées et analysées, il devient possible d&#39;en faire quelque chose.</p>
 <p>Commençons par les trier, puis prendre les dix plus gros pays, et les afficher à l&#39;écran.</p>
 <pre><code>
-    data2 = data.sort(function(a,b) {
-        return d3.descending(a.population, b.population);
-    })
+    data2 = data.sort((a,b) =&gt; d3.descending(a.population, b.population))
     .slice(0,10)
-    .forEach(function(d) {
+    .forEach(d =&gt; {
         d3.select(&#39;body&#39;)
           .append(&#39;p&#39;)
-          .html(d.nom+&#39;: &#39;+d.population);
-    })
-    ;
+          .html(d.nom + &#39;: &#39; + d.population);
+    });
 </code></pre>
 <p>La fonction de tri est un peu compliquée : elle appelle une fonction de d3 qui renvoie 1, 0 ou -1 selon l&#39;ordre des valeurs qu&#39;on lui passe. C&#39;est l&#39;équivalent de :</p>
 <pre><code>
@@ -132,9 +126,7 @@ return 0; // cas de l&#39;égalité entre les deux valeurs
             .append(&#39;p&#39;);
 
         enter
-            .html(function (d) {
-                return d.nom + &#39;: &#39; + d.population;
-            });
+            .html(d =&gt; d.nom + &#39;: &#39; + d.population);
 </code></pre>
 <h3>Qu&#39;est-ce qui s&#39;est passé ?</h3>
 <ul><li>
@@ -162,9 +154,7 @@ return 0; // cas de l&#39;égalité entre les deux valeurs
 </code></pre>
 <p>La séquence qui suit applique une fonction de rappel à chacun des éléments. La fonction de rappel reçoit la <em>donnée associée</em> à l&#39;élément, et le résultat est envoyé dans son code HTML.</p>
 <pre><code>
-    enter.html(function (d) {
-        return d.nom + &#39;: &#39; + d.population;
-    })
+    enter.html(d =&gt; d.nom + &#39;: &#39; + d.population)
 </code></pre>
 <p>Le point le plus important est celui-ci : les données sont désormais enregistrées en tant que telles dans les éléments visuels qui les représentent. Le lien créé est solide et permet toutes les manipulations. Et si l&#39;on modifie les données, l&#39;opération <code>data()</code> sait conserver ces liaisons.</p>
 <h1>7. Un exemple (simpliste) d&#39;interaction avec les données</h1>
@@ -173,10 +163,8 @@ return 0; // cas de l&#39;égalité entre les deux valeurs
         pays
             .enter()
             .append(&#39;p&#39;);
-            .html(function(d,i) {
-               return &#39;pays numéro &#39; + i;
-            })
-            .on(&#39;click&#39;, function (d) {
+            .html((d,i) =&gt; &#39;pays numéro &#39; + i)
+            .on(&#39;click&#39;, d =&gt; {
                 var texte = d.nom + &#39;: &#39; + d.population;
                 alert( texte );
                 this.innerHTML = texte;
@@ -223,9 +211,7 @@ attributs importants: <code>r</code> (rayon); <code>cx, cy</code> (coordonnées 
             .append(&#39;circle&#39;)
             .attr(&#39;cx&#39;, 0)
             .attr(&#39;cy&#39;, 0)
-            .attr(&#39;r&#39;, function (d) {
-                    return 0.005 * Math.sqrt(d.population);
-                })
+            .attr(&#39;r&#39;, d =&gt; 0.005 * Math.sqrt(d.population))
             .attr(&#39;fill&#39;, &#39;transparent&#39;)
             .attr(&#39;stroke&#39;, &#39;red&#39;);
 </code></pre>
@@ -264,17 +250,13 @@ FORME (carré, rond, triangle…)</li>
 <p><code>d3</code> généralise ce principe en définissant des <em>échelles</em> (<em>scales</em>), qui ont un domaine (en entrée, <em>domain</em>) et une étendue (en sortie, <em>range</em>), et convertissent donc des information de leur dimension « données » à leur dimension « visuelle ».</p>
 <p>Ainsi par exemple on écrirait de préférence (<a href='page7.html'><code>page7.html</code></a>) :</p>
 <pre><code>
-        var rayon =d3.scaleSqrt()
-            .domain([ 0, d3.max(data2, function(d) {
-                return d.population;
-            }) ])
+        var rayon = d3.scaleSqrt()
+            .domain([ 0, d3.max(data2, d =&gt; d.population) ])
             .range([ 0, 200 ]);
 </code></pre>
 <p>et puis, plus bas :</p>
 <pre><code>
-           .attr(&#39;r&#39;, function(d) {
-                    return rayon(d.population);
-                })
+           .attr(&#39;r&#39;, d =&gt; rayon(d.population))
 </code></pre>
 <p>Notre graphique est alors défini par des données, qui sont liées à des éléments du SVG (ou du HTML) ; des échelles permettent de définir, pour chaque élément, les variables visuelles qui lui correspondent.</p>
 <p>Plusieurs types d&#39;échelles sont proposés de façon standard par <code>d3</code>; linéaire, logarithmique, à seuils ; mais aussi des échelles de temps (prenant en compte les jours, mois, heure d&#39;hiver etc), ou encore de couleur, où l&#39;étendue n&#39;est pas un nombre mais un code de couleur HTML.</p>
@@ -282,18 +264,12 @@ FORME (carré, rond, triangle…)</li>
 <pre><code>
        var categorie = d3.scaleOrdinal(d3.schemeCategory10);
 …/…
-       … .attr(&#39;r&#39;, function (d) {
-                    return rayon(d.population);
-                })
-         .attr(&#39;fill&#39;, function (d) {
-                    return categorie(d.nom);
-                })
+       … .attr(&#39;r&#39;, d =&gt; rayon(d.population))
+         .attr(&#39;fill&#39;, d =&gt; categorie(d.nom))
 </code></pre>
 <p>Le code suivant vise à sélectionner les ronds dont le rayon serait au moins de 5 pixels; on filtre donc les données <em>par rapport à une variable visuelle</em>:</p>
 <pre><code>
-     data2 = data2.filter(function (d) {
-                return rayon(d.population) &gt; 5;
-            });
+     data2 = data2.filter(d =&gt; rayon(d.population) &gt; 5);
 </code></pre>
 <h1>11. Sur ces principes, construisons notre graphique</h1>
 <p>On voit que la construction du graphique se ramène à deux questions :</p>
@@ -328,28 +304,22 @@ on utilisera ici simplement un <code>&lt;title&gt;</code> en SVG, avec sa syntax
 <h3>population</h3>
 <p>=&gt; rayon, échelle en racine carrée</p>
 <pre><code>
-var rayon =d3.scaleSqrt()
-    .domain([0, d3.max(data, function (d) {
-        return d.pop;
-    })])
+var rayon = d3.scaleSqrt()
+    .domain([0, d3.max(data, d =&gt; d.population)])
     .range([0, 200]);
 </code></pre>
 <h3>abscisse (x)</h3>
 <p>=&gt; richesse du pays (PIB per capita), échelle logarithmique</p>
 <pre><code>
 var x = d3.scaleLog()
-    .domain(d3.extent(data, function (d) {
-        return d.richesse;
-    }))
+    .domain(d3.extent(data, d =&gt; d.richesse))
     .range([0, 640]);
 </code></pre>
 <h3>ordonnée</h3>
 <p>=&gt; espérance de vie (en années), échelle linéaire</p>
 <pre><code>
 var y = d3.scaleLinear()
-    .domain(d3.extent(data, function (d) {
-        return d.sante;
-    }))
+    .domain(d3.extent(data, d =&gt; d.sante))
     .range([0, 400]);
 </code></pre>
 <h3>couleur</h3>
@@ -358,18 +328,10 @@ var categorie = d3.scaleOrdinal(d3.schemeCategory10);
 </code></pre>
 <p>On applique alors ces variables visuelles</p>
 <pre><code>
-    .attr(&#39;cx&#39;, function (d) {
-            return x(d.richesse);
-        })
-    .attr(&#39;cy&#39;, function (d) {
-            return y(d.sante);
-        })
-    .attr(&#39;r&#39;, function (d) {
-            return rayon(d.pop);
-        })
-    .attr(&#39;fill&#39;, function (d) {
-            return categorie(d.nom);
-        })
+    .attr(&#39;cx&#39;, d =&gt; x(d.richesse))
+    .attr(&#39;cy&#39;, d =&gt; y(d.sante))
+    .attr(&#39;r&#39;,  d =&gt; rayon(d.population))
+    .attr(&#39;fill&#39;, d =&gt; categorie(d.nom))
 </code></pre>
 <p>c&#39;est un peu le bazar, mais on retrouve bien nos pays !</p>
 <p>Dans la <a href='page10.html'><code>page10.html</code></a>, on fait quelques tout petits ajustements :</p>
@@ -476,9 +438,7 @@ circle {
 on trie les pays par population décroissante, de manière à ce qu&#39;on petit ne soit pas éclipsé par un gros </li>
 </ul>
 <pre><code>
-data.sort(function(a,b) {
-    return d3.descending(a.pop, b.pop);
-});
+data.sort((a,b) =&gt; d3.descending(a.population, b.population));
 </code></pre>
 <h1>17. Ajout de tooltips</h1>
 <p>On utilise le plugin <code>d3-tip</code> pour créer des bulles au survol (<a href='page15.html'><code>page15.html</code></a>).</p>
@@ -487,9 +447,7 @@ data.sort(function(a,b) {
 var tip = d3.tip()
     .attr(&#39;class&#39;, &#39;d3-tip&#39;)
     .offset([-10, 0])
-    .html(function (d) {
-        return d.nom;
-    });
+    .html(d =&gt; d.nom);
 d3.select(&#39;svg&gt;g&#39;).call(tip);
 </code></pre>
 <p>Le code qui le déclenche est ajouté aux bulles après leur création (dans la partie <code>.enter</code>) :</p>
@@ -514,19 +472,15 @@ d3.select(&#39;svg&gt;g&#39;).call(tip);
     
     var line = function (d) {
         return d3.line()
-            .x(function (t) {
-                return x(valeur(d.richesse, t));
-            })
-            .y(function (t) {
-                return y(valeur(d.sante, t));
-            })
+            .x(t =&gt; x(valeur(d.richesse, t)))
+            .y(t =&gt; y(valeur(d.sante, t)))
             .curve(d3.curveBasis);
     }
 
 </code></pre>
 <p>et au survol d&#39;un pays, on appelle cette fonction :</p>
 <pre><code>
-    .on(&#39;mouseover&#39;, function (d) {
+    .on(&#39;mouseover&#39;, d =&gt; {
         tip.show(d);
         create_line(d);
      })
