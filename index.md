@@ -47,7 +47,7 @@ Commençons tout de suite par une structure de page Web classique, contenant deu
 Dans ce script, commençons tout de suite par charger nos données :
 
 ```
-d3.csv('recent.csv', function(data) {
+d3.csv('recent.csv', data => {
     console.log(data);
 });
 ```
@@ -101,29 +101,23 @@ Dans la fonction de rappel de `d3.csv`, on va traiter la liste de données `data
 
 ```
     data
-    .map(function(d) {
-        var e = {
+    .map(d => ({
             nom: d.key,
             population: +d.population,
-        };
-        return e;
-    });
+        }));
 ```
 
 Maintenant que les données sont chargées et analysées, il devient possible d'en faire quelque chose.
 
 Commençons par les trier, puis prendre les dix plus gros pays, et les afficher à l'écran.
 ```
-    data2 = data.sort(function(a,b) {
-        return d3.descending(a.population, b.population);
-    })
+    data2 = data.sort((a,b) => d3.descending(a.population, b.population))
     .slice(0,10)
-    .forEach(function(d) {
+    .forEach(d => {
         d3.select('body')
           .append('p')
-          .html(d.nom+': '+d.population);
-    })
-    ;
+          .html(d.nom + ': ' + d.population);
+    });
 ```
 
 La fonction de tri est un peu compliquée : elle appelle une fonction de d3 qui renvoie 1, 0 ou -1 selon l'ordre des valeurs qu'on lui passe. C'est l'équivalent de :
@@ -161,9 +155,7 @@ Cette méthode consiste à remplacer le code précédent par la construction un 
             .append('p');
 
         enter
-            .html(function (d) {
-                return d.nom + ': ' + d.population;
-            });
+            .html(d => d.nom + ': ' + d.population);
 ```
 
 ### Qu'est-ce qui s'est passé ?
@@ -189,9 +181,7 @@ La séquence ci-dessous crée les éléments en question.
 La séquence qui suit applique une fonction de rappel à chacun des éléments. La fonction de rappel reçoit la _donnée associée_ à l'élément, et le résultat est envoyé dans son code HTML.
 
 ```
-    enter.html(function (d) {
-        return d.nom + ': ' + d.population;
-    })
+    enter.html(d => d.nom + ': ' + d.population)
 ```
 
 Le point le plus important est celui-ci : les données sont désormais enregistrées en tant que telles dans les éléments visuels qui les représentent. Le lien créé est solide et permet toutes les manipulations. Et si l'on modifie les données, l'opération `data()` sait conserver ces liaisons.
@@ -205,10 +195,8 @@ Dans cet exemple ([`page4.html`](page4.html)), on modifie simplement la créatio
         pays
             .enter()
             .append('p');
-            .html(function(d,i) {
-               return 'pays numéro ' + i;
-            })
-            .on('click', function (d) {
+            .html((d,i) => 'pays numéro ' + i)
+            .on('click', d => {
                 var texte = d.nom + ': ' + d.population;
                 alert( texte );
                 this.innerHTML = texte;
@@ -267,9 +255,7 @@ Ce morceau de notre page Web définit un SVG, avec un calque positionné en son 
             .append('circle')
             .attr('cx', 0)
             .attr('cy', 0)
-            .attr('r', function (d) {
-                    return 0.005 * Math.sqrt(d.population);
-                })
+            .attr('r', d => 0.005 * Math.sqrt(d.population))
             .attr('fill', 'transparent')
             .attr('stroke', 'red');
 ```
@@ -308,18 +294,14 @@ Le rayon de notre cercle (`r`) correspond à la variable visuelle TAILLE. Le bou
 Ainsi par exemple on écrirait de préférence ([`page7.html`](page7.html)) :
 
 ```
-        var rayon =d3.scaleSqrt()
-            .domain([ 0, d3.max(data2, function(d) {
-                return d.population;
-            }) ])
+        var rayon = d3.scaleSqrt()
+            .domain([ 0, d3.max(data2, d => d.population) ])
             .range([ 0, 200 ]);
 ```
 
 et puis, plus bas :
 ```
-           .attr('r', function(d) {
-                    return rayon(d.population);
-                })
+           .attr('r', d => rayon(d.population))
 ```
 
 Notre graphique est alors défini par des données, qui sont liées à des éléments du SVG (ou du HTML) ; des échelles permettent de définir, pour chaque élément, les variables visuelles qui lui correspondent.
@@ -331,19 +313,13 @@ Une échelle très pratique est `d3.scale.category10()`. On la découvre [`page8
 ```
        var categorie = d3.scaleOrdinal(d3.schemeCategory10);
 …/…
-       … .attr('r', function (d) {
-                    return rayon(d.population);
-                })
-         .attr('fill', function (d) {
-                    return categorie(d.nom);
-                })
+       … .attr('r', d => rayon(d.population))
+         .attr('fill', d => categorie(d.nom))
 ```
 
 Le code suivant vise à sélectionner les ronds dont le rayon serait au moins de 5 pixels; on filtre donc les données _par rapport à une variable visuelle_:
 ```
-     data2 = data2.filter(function (d) {
-                return rayon(d.population) > 5;
-            });
+     data2 = data2.filter(d => rayon(d.population) > 5);
 ```
 
 
@@ -383,28 +359,22 @@ on utilisera ici simplement un `<title>` en SVG, avec sa syntaxe particulière.
 ### population
 => rayon, échelle en racine carrée
 ```
-var rayon =d3.scaleSqrt()
-    .domain([0, d3.max(data, function (d) {
-        return d.pop;
-    })])
+var rayon = d3.scaleSqrt()
+    .domain([0, d3.max(data, d => d.population)])
     .range([0, 200]);
 ```
 ### abscisse (x)
 => richesse du pays (PIB per capita), échelle logarithmique
 ```
 var x = d3.scaleLog()
-    .domain(d3.extent(data, function (d) {
-        return d.richesse;
-    }))
+    .domain(d3.extent(data, d => d.richesse))
     .range([0, 640]);
 ```
 ### ordonnée
 => espérance de vie (en années), échelle linéaire
 ```
 var y = d3.scaleLinear()
-    .domain(d3.extent(data, function (d) {
-        return d.sante;
-    }))
+    .domain(d3.extent(data, d => d.sante))
     .range([0, 400]);
 ```
 
@@ -415,18 +385,10 @@ var categorie = d3.scaleOrdinal(d3.schemeCategory10);
 
 On applique alors ces variables visuelles
 ```
-    .attr('cx', function (d) {
-            return x(d.richesse);
-        })
-    .attr('cy', function (d) {
-            return y(d.sante);
-        })
-    .attr('r', function (d) {
-            return rayon(d.pop);
-        })
-    .attr('fill', function (d) {
-            return categorie(d.nom);
-        })
+    .attr('cx', d => x(d.richesse))
+    .attr('cy', d => y(d.sante))
+    .attr('r',  d => rayon(d.population))
+    .attr('fill', d => categorie(d.nom))
 ```
 
 c'est un peu le bazar, mais on retrouve bien nos pays !
@@ -559,9 +521,7 @@ circle {
 ```
 - on trie les pays par population décroissante, de manière à ce qu'on petit ne soit pas éclipsé par un gros 
 ```
-data.sort(function(a,b) {
-    return d3.descending(a.pop, b.pop);
-});
+data.sort((a,b) => d3.descending(a.population, b.population));
 ```
 
 # 17. Ajout de tooltips
@@ -572,9 +532,7 @@ On utilise le plugin `d3-tip` pour créer des bulles au survol ([`page15.html`](
 var tip = d3.tip()
     .attr('class', 'd3-tip')
     .offset([-10, 0])
-    .html(function (d) {
-        return d.nom;
-    });
+    .html(d => d.nom);
 d3.select('svg>g').call(tip);
 ```
 
@@ -603,12 +561,8 @@ On crée une ligne vide, et une fonction qui lui donne sa forme entre les dates 
     
     var line = function (d) {
         return d3.line()
-            .x(function (t) {
-                return x(valeur(d.richesse, t));
-            })
-            .y(function (t) {
-                return y(valeur(d.sante, t));
-            })
+            .x(t => x(valeur(d.richesse, t)))
+            .y(t => y(valeur(d.sante, t)))
             .curve(d3.curveBasis);
     }
 
@@ -616,7 +570,7 @@ On crée une ligne vide, et une fonction qui lui donne sa forme entre les dates 
 
 et au survol d'un pays, on appelle cette fonction :
 ```
-    .on('mouseover', function (d) {
+    .on('mouseover', d => {
         tip.show(d);
         create_line(d);
      })
