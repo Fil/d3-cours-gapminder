@@ -114,10 +114,10 @@
     var line = function (d) {
         return d3.line()
             .x(function (t) {
-                return x(d.values[t - 1800].gdp || 1);
+                return x(d.values[t - 1800].richesse || 1);
             })
             .y(function (t) {
-                return y(d.values[t - 1800].life || 1);
+                return y(d.values[t - 1800].sante || 1);
             })
             .curve(d3.curveBasis);
     }
@@ -138,8 +138,8 @@
 
 	d3.json('by_year.json', function (error, data) {
 
-            x.domain([100, d3.max(data, d => d3.max(d.values.map(e => e.gdp)))]);
-            y.domain([10, d3.max(data, d => d3.max(d.values.map(e => e.life)))]);
+            x.domain([100, d3.max(data, d => d3.max(d.values.map(e => e.richesse)))]);
+            y.domain([10, d3.max(data, d => d3.max(d.values.map(e => e.sante)))]);
             r.domain([0, d3.max(data, d => d3.max(d.values.map(e => e.population)))]);
 
 
@@ -241,8 +241,8 @@
             .delay(0)
             .duration(300)
             .ease(d3.easeLinear)
-				  .attr('cx', d => x(d.values[year - 1800].gdp || 1))
-				  .attr('cy', d => y(d.values[year - 1800].life))
+				  .attr('cx', d => x(d.values[year - 1800].richesse || 1))
+				  .attr('cy', d => y(d.values[year - 1800].sante))
 				  .attr('r', d => 2);
 			}
 

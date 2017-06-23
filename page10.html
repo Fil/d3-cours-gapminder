@@ -23,8 +23,8 @@
 		data = data.map(d => ({
 			nom: d.key,
 			population: +d.population,
-			gdp: +d.gdp,
-			life: +d.life,
+			richesse: +d.richesse,
+			sante: +d.sante,
 			continent: d.continent,
 		}));
             var rayon = d3.scaleSqrt()
@@ -35,13 +35,13 @@
 
             var x = d3.scaleLog()
                 .domain(d3.extent(data, function (d) {
-                    return d.gdp;
+                    return d.richesse;
                 }))
                 .range([0, 640]);
 
             var y = d3.scaleLinear()
                 .domain(d3.extent(data, function (d) {
-                    return d.life;
+                    return d.sante;
                 }))
                 .range([400, 0]);
 
@@ -55,10 +55,10 @@
                 .enter()
                 .append('circle')
                 .attr('cx', function (d) {
-                        return x(d.gdp);
+                        return x(d.richesse);
                     })
                 .attr('cy',function (d) {
-                        return y(d.life);
+                        return y(d.sante);
                     })
                 .attr('r', function (d) {
                         return rayon(d.population);
