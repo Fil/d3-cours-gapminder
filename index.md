@@ -556,13 +556,13 @@ On crée une ligne vide, et une fonction qui lui donne sa forme entre les dates 
         var l = line(d);
         d3.selectAll('path.timeline')
             .transition()
-            .attr('d', l(d3.range(1960-1, 2015+1)));
+            .attr('d', l(d3.range(1800, 2016)));
     }
     
-    var line = function (d) {
+	var line = function (d) {
         return d3.line()
-            .x(t => x(valeur(d.richesse, t)))
-            .y(t => y(valeur(d.sante, t)))
+            .x(t => x(d.values[t - 1800].richesse || 1))
+            .y(t => y(d.values[t - 1800].sante || 1))
             .curve(d3.curveBasis);
     }
 
